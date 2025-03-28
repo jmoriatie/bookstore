@@ -1,5 +1,5 @@
 package com.solve.bookstore.domain.book.model;
-
+import com.solve.bookstore.domain.Rental.model.Rental;
 import com.solve.bookstore.domain.category.model.Category;
 import lombok.Builder;
 import lombok.Getter;
@@ -15,9 +15,7 @@ public class Book {
 
     @Builder
     public Book(BookId id, String title, String author, Category category, String description) {
-
         validate(title, author, category);
-
         this.id = id != null? id : new BookId(); // ID 확인 후 없을 경우 새로 생성
         this.title = title;
         this.author = author;
@@ -40,7 +38,7 @@ public class Book {
 
     private void updateCategory(Category newCategory){
         if(newCategory == null){
-            throw new IllegalArgumentException("update 할 카테고리가 비어있습니다.");
+            throw new IllegalArgumentException("update 할 카테고리가 없습니다.");
         }
         this.category = newCategory;
     }
@@ -49,7 +47,20 @@ public class Book {
         this.status = newStatus;
     }
 
-    // TODO 렌탈 가능 여부 확인
-    // TODO 렌탈
-    // TODO 반납
+    // 렌탈 가능 여부 확인
+    public boolean isAvailableForRental(){
+        return this.status == BookStatus.AVAILABLE;
+    }
+
+    // 렌탈
+    public void rent(){
+        if(!isAvailableForRental()){
+            throw new IllegalArgumentException("대여할 수 없는 도서 입니다");
+        }
+        this.status = BookStatus.RENTED;
+    }
+    // 반납
+    public void returnBook(Rental rental){
+        this.status = BookStatus.AVAILABLE;
+    }
 }
