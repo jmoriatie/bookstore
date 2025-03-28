@@ -1,0 +1,32 @@
+spring:
+  application:
+    name: bookstore
+
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+    defer-datasource-initialization: true
+    hibernate:
+      ddl-auto: create-drop # test
+    properties:
+      hibernate:
+        show-sql: true
+        format_sql: true
+    open-in-view: false
+
+    # h2 db datasource
+    h2:
+      console:
+        enabled: true
+        path: /h2-console
+
+    datasource:
+      driver-class-name: org.h2.Driver
+      url: jdbc:h2:mem:testdb;MODE=MariaDB
+      username: sa
+      password:
+
+    redis:
+      host: localhost
+      port: 6379
+      # password:
+      timeout: 10000ms
