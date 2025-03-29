@@ -6,7 +6,9 @@ import com.solve.bookstore.domain.book.repository.BookRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 /**
  * BookRepository 데코레이터 패턴 적용
@@ -18,12 +20,27 @@ public class BookRepositoryImpl implements BookRepository {
     private final BookJpaRepository bookJpaRepository; // BookRepository jpa 활용
 
     @Override
-    public Book save(Book book) {
+    public BookId save(Book book) {
+        return null;
+    }
+
+    @Override
+    public List<BookId> saveAll(List<Book> books) {
+        return null;
+    }
+
+    @Override
+    public List<BookId> saveAll(Set<Book> books) {
         return null;
     }
 
     @Override
     public Optional<Book> findById(BookId id) {
         return Optional.empty();
+    }
+
+    @Override
+    public List<Book> findByIsbn(String isbn) {
+        return null;
     }
 }

@@ -10,6 +10,10 @@ import com.solve.bookstore.domain.category.repository.CategoryRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+
 
 @Service
 public class BookService {
@@ -22,17 +26,25 @@ public class BookService {
 
     // 요구사항
     // --- 도메인 기능 ---
-    // TODO 도서 카테고리 변경 가능 updateCategory
+    // TODO 도서 카테고리 변경 가능 updateCategorys
+    // TODO 도서 카테고리 변경 가능 updateCategorys
     @Transactional
-    public void changeCategory(CategoryUpdateRequest request){
+    public void changeCategorys(CategoryUpdateRequest request){
         Book book = bookRepository.findById(new BookId(request.bookId()))
                 .orElseThrow(() -> new IllegalArgumentException("도서를 찾을 수 없습니다. 도서 ID:"+request.bookId()));
 
-        Category newCategory = categoryRepository.findById(new CategoryId(request.categoryId()))
-                .orElseThrow(() -> new IllegalArgumentException("카테고리를 찾을 수 없습니다. 도서 ID:" + request.categoryId()));
-        book.updateCategory(newCategory);
+        List<Book> sameTitleBooks = bookRepository.findByIsbn(book.getIsbn().toString()); // isbn 으로 전체 찾기
 
-        bookRepository.save(book);
+        // 카테고리 찾기
+        Set<CategoryId> newCategoryIds = request.categoryIds().stream()
+                .map(CategoryId::new)
+                .collect(Collectors.toSet());
+        List<Category> newCategorys = categoryRepository.findAllByIds(newCategoryIds);
+
+        sameTitleBooks.forEach(b -> b.updateCategorys(newCategorys)); // 카테고리 바꾸기
+
+        List<BookId> bookIds = bookRepository.saveAll(sameTitleBooks);
+        // TODO Response DTO 만들기
     }
     // TODO 훼손, 분실 대여 중단
     //  - 대여가능 여부 확인 isAvailableForRental

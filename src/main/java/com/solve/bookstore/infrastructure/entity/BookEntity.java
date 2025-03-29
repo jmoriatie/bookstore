@@ -24,14 +24,16 @@ public class BookEntity extends BaseEntity {
     @Column(nullable = false)
     private String author; // 지은이
 
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "category_id", nullable = false)
-    private CategoryEntity category; // 카테고리
+    @OneToMany(mappedBy = "book", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<BookCategoryEntity> bookCategorys = new ArrayList<>(); // 연관 매핑
 
     private String description; // 도서 설명
 
     @Column(nullable = false)
     private BookStatus status; // 도서 상태
+
+    @Column(nullable = false)
+    private String isbn; // 도서 타이틀 고유식별값
 
     @OneToMany(mappedBy = "book")
     private List<RentalEntity> rentals = new ArrayList<>();

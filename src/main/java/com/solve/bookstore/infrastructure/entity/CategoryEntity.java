@@ -21,5 +21,5 @@ public class CategoryEntity extends BaseEntity {
     private String name;
 
     @OneToMany(mappedBy = "category")
-    private List<BookEntity> books = new ArrayList<>();
+    private List<BookCategoryEntity> bookCategorys = new ArrayList<>(); // 연관 매핑
 }
