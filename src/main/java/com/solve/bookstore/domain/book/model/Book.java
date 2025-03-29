@@ -36,14 +36,14 @@ public class Book {
         }
     }
 
-    private void updateCategory(Category newCategory){
+    public void updateCategory(Category newCategory){
         if(newCategory == null){
             throw new IllegalArgumentException("update 할 카테고리가 없습니다.");
         }
         this.category = newCategory;
     }
 
-    private void updateStatus(BookStatus newStatus){
+    public void updateStatus(BookStatus newStatus){
         this.status = newStatus;
     }
 
