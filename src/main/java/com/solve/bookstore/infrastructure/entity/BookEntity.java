@@ -30,11 +30,24 @@ public class BookEntity extends BaseEntity {
     private String description; // 도서 설명
 
     @Column(nullable = false)
-    private BookStatus status; // 도서 상태
+    private String status; // 도서 상태
 
     @Column(nullable = false)
     private String isbn; // 도서 타이틀 고유식별값
 
     @OneToMany(mappedBy = "book")
     private List<RentalEntity> rentals = new ArrayList<>();
+
+    private BookEntity(String id, String title, String author, String description, String status, String isbn) {
+        this.id = id;
+        this.title = title;
+        this.author = author;
+        this.description = description;
+        this.status = status;
+        this.isbn = isbn;
+    }
+
+    public static BookEntity from(String id, String title, String author, String description, String status, String isbn){
+        return new BookEntity(id, title, author, description, status, isbn);
+    }
 }

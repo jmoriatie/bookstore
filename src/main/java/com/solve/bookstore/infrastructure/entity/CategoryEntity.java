@@ -22,4 +22,13 @@ public class CategoryEntity extends BaseEntity {
 
     @OneToMany(mappedBy = "category")
     private List<BookCategoryEntity> bookCategorys = new ArrayList<>(); // 연관 매핑
+
+    private CategoryEntity(String id, String name) {
+        this.id = id;
+        this.name = name;
+    }
+
+    public static CategoryEntity from(String id, String name){
+         return new CategoryEntity(id, name);
+    }
 }

@@ -2,7 +2,6 @@ package com.solve.bookstore.domain.book.model;
 
 import lombok.Getter;
 
-@Getter
 public class Isbn {
     String serialNumber;
 
