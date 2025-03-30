@@ -16,6 +16,11 @@ public interface BookRepository {
     List<BookId> saveAll(List<Book> books);
     List<BookId> saveAll(Set<Book> books);
 
+    List<Book> findAllByIds(List<BookId> ids);
+    List<Book> findAllByIds(Set<BookId> ids);
+    
     Optional<Book> findById(BookId id);
     List<Book> findByIsbn(String isbn);
+
+    int deleteAll();
 }

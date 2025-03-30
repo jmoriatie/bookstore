@@ -35,6 +35,16 @@ public class BookRepositoryImpl implements BookRepository {
     }
 
     @Override
+    public List<Book> findAllByIds(List<BookId> ids) {
+        return null;
+    }
+
+    @Override
+    public List<Book> findAllByIds(Set<BookId> ids) {
+        return null;
+    }
+
+    @Override
     public Optional<Book> findById(BookId id) {
         return Optional.empty();
     }
@@ -42,5 +52,10 @@ public class BookRepositoryImpl implements BookRepository {
     @Override
     public List<Book> findByIsbn(String isbn) {
         return null;
+    }
+
+    @Override
+    public int deleteAll() {
+        return 0;
     }
 }

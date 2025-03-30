@@ -1,5 +1,6 @@
 package com.solve.bookstore.application;
 
+import com.solve.bookstore.application.dto.CategoryChangedResponse;
 import com.solve.bookstore.application.dto.CategoryUpdateRequest;
 import com.solve.bookstore.domain.book.model.Book;
 import com.solve.bookstore.domain.book.model.BookId;
@@ -27,9 +28,8 @@ public class BookService {
     // 요구사항
     // --- 도메인 기능 ---
     // TODO 도서 카테고리 변경 가능 updateCategorys
-    // TODO 도서 카테고리 변경 가능 updateCategorys
     @Transactional
-    public void changeCategorys(CategoryUpdateRequest request){
+    public CategoryChangedResponse changeCategorys(CategoryUpdateRequest request){
         Book book = bookRepository.findById(new BookId(request.bookId()))
                 .orElseThrow(() -> new IllegalArgumentException("도서를 찾을 수 없습니다. 도서 ID:"+request.bookId()));
 
@@ -44,8 +44,15 @@ public class BookService {
         sameTitleBooks.forEach(b -> b.updateCategorys(newCategorys)); // 카테고리 바꾸기
 
         List<BookId> bookIds = bookRepository.saveAll(sameTitleBooks);
-        // TODO Response DTO 만들기
+
+        return new CategoryChangedResponse(bookIds);
     }
+
+//    @Transactional
+//    public void createBook(BookCreateRequest request){
+//
+//    }
+
     // TODO 훼손, 분실 대여 중단
     //  - 대여가능 여부 확인 isAvailableForRental
     //  - 훼손, 분실로 변경 updateCategory
