@@ -7,8 +7,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
-// TODO POJO 유지 & 추상화
-//  mock test
 public interface BookRepository {
 
     BookId save(Book book);

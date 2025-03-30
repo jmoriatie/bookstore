@@ -10,8 +10,8 @@ import java.util.Set;
 public interface CategoryRepository {
 
     Optional<Category> findById(CategoryId id);
-    List<Category> findAllByIds(Set<CategoryId> ids);
-    List<Category> findAllByIds(List<CategoryId> ids);
+    Set<CategoryId> findAllIdsByIds(Set<CategoryId> ids);
+    List<Category> findAllIdsByIds(List<CategoryId> ids);
 
     int deleteAll();
 }

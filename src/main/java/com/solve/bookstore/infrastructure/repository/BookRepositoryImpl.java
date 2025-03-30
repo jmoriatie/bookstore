@@ -3,6 +3,7 @@ package com.solve.bookstore.infrastructure.repository;
 import com.solve.bookstore.domain.book.model.Book;
 import com.solve.bookstore.domain.book.model.BookId;
 import com.solve.bookstore.domain.book.repository.BookRepository;
+import com.solve.bookstore.infrastructure.repository.mapper.BookMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
@@ -18,6 +19,7 @@ import java.util.Set;
 public class BookRepositoryImpl implements BookRepository {
 
     private final BookJpaRepository bookJpaRepository; // BookRepository jpa 활용
+    private final BookMapper bookMapper;
 
     @Override
     public BookId save(Book book) {

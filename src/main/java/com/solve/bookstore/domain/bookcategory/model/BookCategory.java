@@ -6,11 +6,19 @@ import com.solve.bookstore.domain.category.model.CategoryId;
 public class BookCategory {
     BookCategoryId id;
 
+    public BookCategory(BookCategoryId id) {
+        this.id = id;
+    }
+
     public BookId getBookId(){
         return new BookId(this.id.getBookId());
     }
 
     public CategoryId getCategoryId(){
         return new CategoryId(this.id.getCategoryId());
+    }
+
+    public static BookCategory create(BookId bookId, CategoryId categoryId){
+        return new BookCategory(new BookCategoryId(bookId.toString(), categoryId.toString()));
     }
 }

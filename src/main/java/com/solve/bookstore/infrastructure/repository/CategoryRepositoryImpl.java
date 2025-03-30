@@ -22,12 +22,12 @@ public class CategoryRepositoryImpl implements CategoryRepository {
     }
 
     @Override
-    public List<Category> findAllByIds(Set<CategoryId> ids) {
+    public List<Category> findAllIdsByIds(Set<CategoryId> ids) {
         return null;
     }
 
     @Override
-    public List<Category> findAllByIds(List<CategoryId> ids) {
+    public List<Category> findAllIdsByIds(List<CategoryId> ids) {
         return null;
     }
 
