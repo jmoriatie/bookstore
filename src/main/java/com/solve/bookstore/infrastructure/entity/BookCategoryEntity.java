@@ -11,15 +11,17 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class BookCategoryEntity extends BaseEntity {
 
-    @Embedded
+    @EmbeddedId
     BookCategoryEntityId id;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "book_id")
+    @MapsId("bookId")
     BookEntity book;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id")
+    @MapsId("categoryId")
     CategoryEntity category;
 
     public BookCategoryEntity(BookEntity book, CategoryEntity category) {
