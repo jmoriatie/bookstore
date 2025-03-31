@@ -42,7 +42,7 @@ public class Book {
     }
 
     public static Book rebuild(BookId id, String title, String author, String description, BookStatus status, Isbn isbn){
-        return new Book(id, title, author, description, description, isbn);
+        return new Book(id, title, author, description, status, isbn);
     }
 
     public void updateStatus(BookStatus newStatus){

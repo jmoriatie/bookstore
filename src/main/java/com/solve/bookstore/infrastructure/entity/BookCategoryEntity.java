@@ -24,9 +24,23 @@ public class BookCategoryEntity extends BaseEntity {
     @MapsId("categoryId")
     CategoryEntity category;
 
-    public BookCategoryEntity(BookEntity book, CategoryEntity category) {
+    private BookCategoryEntity(BookEntity book, CategoryEntity category) {
         this.id = new BookCategoryEntityId(book.getId(), category.getId());
         this.book = book;
         this.category = category;
+    }
+
+    private BookCategoryEntity(BookCategoryEntityId entityId, BookEntity book, CategoryEntity category) {
+        this.id = entityId;
+        this.book = book;
+        this.category = category;
+    }
+
+    public static BookCategoryEntity create(BookEntity bookEntity, CategoryEntity categoryEntity){
+        return new BookCategoryEntity(bookEntity, categoryEntity);
+    }
+
+    public static BookCategoryEntity rebuild(BookCategoryEntityId entityId, BookEntity bookEntity, CategoryEntity categoryEntity){
+        return new BookCategoryEntity(entityId, bookEntity, categoryEntity);
     }
 }

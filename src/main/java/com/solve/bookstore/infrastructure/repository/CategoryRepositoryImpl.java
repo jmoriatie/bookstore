@@ -22,7 +22,7 @@ public class CategoryRepositoryImpl implements CategoryRepository {
     }
 
     @Override
-    public List<Category> findAllIdsByIds(Set<CategoryId> ids) {
+    public Set<CategoryId> findAllIdsByIds(Set<CategoryId> ids) {
         return null;
     }
 

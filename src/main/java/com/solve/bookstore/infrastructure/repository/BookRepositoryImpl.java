@@ -11,9 +11,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
-/**
- * BookRepository 데코레이터 패턴 적용
- */
 @Repository
 @RequiredArgsConstructor
 public class BookRepositoryImpl implements BookRepository {

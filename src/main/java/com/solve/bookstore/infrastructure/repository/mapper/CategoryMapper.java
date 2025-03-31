@@ -24,6 +24,6 @@ public class CategoryMapper {
      */
     public CategoryEntity toEntity(Category domain){
         if(domain == null) return null;
-        return CategoryEntity.from(domain.getId().toString(), domain.getName());
+        return CategoryEntity.create(domain.getId().toString(), domain.getName());
     }
 }

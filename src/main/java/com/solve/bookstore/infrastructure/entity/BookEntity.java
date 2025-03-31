@@ -47,6 +47,10 @@ public class BookEntity extends BaseEntity {
         this.isbn = isbn;
     }
 
+    public static BookEntity create(String id, String title, String author, String description, String isbn){
+        return new BookEntity(id, title, author, description, BookStatus.AVAILABLE.name(), isbn);
+    }
+
     public static BookEntity from(String id, String title, String author, String description, String status, String isbn){
         return new BookEntity(id, title, author, description, status, isbn);
     }

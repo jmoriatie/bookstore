@@ -28,7 +28,7 @@ public class CategoryEntity extends BaseEntity {
         this.name = name;
     }
 
-    public static CategoryEntity from(String id, String name){
+    public static  CategoryEntity create(String id, String name){
          return new CategoryEntity(id, name);
     }
 }
