@@ -37,6 +37,8 @@ public class BookCategoryEntity extends BaseEntity {
     }
 
     public static BookCategoryEntity create(BookEntity bookEntity, CategoryEntity categoryEntity){
+        if(bookEntity == null) throw new IllegalArgumentException("BookEntity 를 입력해주세요.");
+        if(categoryEntity == null) throw new IllegalArgumentException("CategoryEntity 를 입력해주세요");
         return new BookCategoryEntity(bookEntity, categoryEntity);
     }
 

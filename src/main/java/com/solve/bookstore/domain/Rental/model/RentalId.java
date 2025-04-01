@@ -5,7 +5,6 @@ import lombok.Getter;
 
 import java.util.UUID;
 
-@Getter
 @EqualsAndHashCode
 public class RentalId {
     private final String id;

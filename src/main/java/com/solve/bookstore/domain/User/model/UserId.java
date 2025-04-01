@@ -5,7 +5,6 @@ import lombok.Getter;
 
 import java.util.UUID;
 
-@Getter
 @EqualsAndHashCode
 public class UserId {
     private final String id;

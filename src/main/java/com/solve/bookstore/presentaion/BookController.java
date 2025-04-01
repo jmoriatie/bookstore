@@ -21,10 +21,10 @@ public class BookController {
      * 카테고리 업데이트
      */
     @PatchMapping("/{bookId}")
-    public ResponseEntity<CategoryChangedResponse> changeCategorys(
+    public ResponseEntity<CategoryChangedResponse> changeCategories(
             @PathVariable String bookId,
             @RequestBody @Valid List<String> categoryIds){
-        CategoryChangedResponse response = bookService.changeCategorys(
+        CategoryChangedResponse response = bookService.changeCategories(
                 bookId, new CategoryUpdateRequest(categoryIds));
         return ResponseEntity.ok(response);
     }

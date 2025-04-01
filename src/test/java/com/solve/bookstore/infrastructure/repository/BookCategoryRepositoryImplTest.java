@@ -54,11 +54,8 @@ class BookCategoryRepositoryImplTest {
         @BeforeEach
         void setUp() {
             bookCategoryJpaRepository.deleteAll();
-            ;
             bookJpaRepository.deleteAll();
-            ;
             categoryJpaRepository.deleteAll();
-            ;
 
             bookId = new BookId("book-1");
             categoryId = new CategoryId("category-1");

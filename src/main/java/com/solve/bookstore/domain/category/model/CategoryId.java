@@ -5,7 +5,6 @@ import lombok.Getter;
 
 import java.util.UUID;
 
-@Getter
 @EqualsAndHashCode
 public class CategoryId {
     private final String id;

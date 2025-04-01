@@ -2,9 +2,13 @@ package com.solve.bookstore.domain.bookcategory.model;
 
 import com.solve.bookstore.domain.book.model.BookId;
 import com.solve.bookstore.domain.category.model.CategoryId;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
 
+@Getter
+@EqualsAndHashCode
 public class BookCategory {
-    BookCategoryId id;
+    private BookCategoryId id;
 
     public BookCategory(BookCategoryId id) {
         this.id = id;
