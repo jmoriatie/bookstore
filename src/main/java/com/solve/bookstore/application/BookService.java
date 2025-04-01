@@ -1,5 +1,6 @@
 package com.solve.bookstore.application;
 
+import com.solve.bookstore.application.dto.BookCreateRequest;
 import com.solve.bookstore.application.dto.CategoryChangedResponse;
 import com.solve.bookstore.application.dto.CategoryUpdateRequest;
 import com.solve.bookstore.domain.book.model.Book;
@@ -36,7 +37,7 @@ public class BookService {
     // 도서 카테고리 변경 가능 updateCategorys
     @Transactional
     public CategoryChangedResponse changeCategories(String bookId, CategoryUpdateRequest request) {
-        if (hasUpdatableCategory(request))
+        if (hasNoCategories(request.categoryIds()))
             return new CategoryChangedResponse(Collections.emptySet());
 
         Set<BookId> sameIsbnBookIds = getSameIsbnBooks(getBook(bookId));
@@ -44,19 +45,49 @@ public class BookService {
         validateCategory(newCategoryIds);
 
         bookCategoryRepository.deleteByBookIdIn(sameIsbnBookIds); // 연관관계 삭제
-        saveNewCategories(sameIsbnBookIds, newCategoryIds);
+        saveBookCategoriesForAllBook(sameIsbnBookIds, newCategoryIds);
 
         return new CategoryChangedResponse(sameIsbnBookIds);
     }
 
-    private void saveNewCategories(Set<BookId> sameIsbnBookIds, Set<CategoryId> newCategoryIds) {
-        List<BookCategory> newBookCategories = new ArrayList<>();
-        for (BookId bId : sameIsbnBookIds) {
-            for (CategoryId cId : newCategoryIds) {
-                newBookCategories.add(BookCategory.create(bId, cId));
-            }
-        }
-        bookCategoryRepository.saveAll(newBookCategories);
+    @Transactional
+    public Book createBook(BookCreateRequest request){
+        if(hasNoCategories(request.categoryIds()))
+            throw new IllegalArgumentException("저장할 카테고리가 없습니다.");
+
+        Set<CategoryId> categoryIds = request.categoryIds().stream()
+                .map(CategoryId::new)
+                .collect(Collectors.toSet());
+
+        validateCategory(categoryIds);
+
+        Book savedBook = bookRepository.save(request.toDomain());
+
+        // BookCategory 연관관계 저장
+        saveBookCategories(savedBook.getId(), categoryIds);
+        return savedBook;
+    }
+
+
+    // TODO 훼손, 분실 대여 중단
+    //  - 대여가능 여부 확인 isAvailableForRental
+    //  - 훼손, 분실로 변경 updateCategory
+
+    // --- 서칭 관련 ---
+    // TODO 카테고리별 도서 검색
+    // TODO 지은이, 제목 도서 검색
+
+    // --- 필요 ---
+    // TODO CRUD
+    //  - 도서 등록 - 요구사항: 신규도서는 항상 카테고리가 필요하다
+    //  - 도서 전체 업데이트?
+    // TODO Exception 커스텀
+
+    /**
+     * request에 category 유무 확인
+     */
+    private static boolean hasNoCategories(List<String> categoryIds) {
+        return categoryIds == null || categoryIds.isEmpty();
     }
 
     /**
@@ -68,13 +99,8 @@ public class BookService {
                 .collect(Collectors.toSet());
     }
 
-    private static boolean hasUpdatableCategory(CategoryUpdateRequest request) {
-        return request.categoryIds().isEmpty();
-    }
-
     private Book getBook(String bookId) {
         return bookRepository.findById(new BookId(bookId));
-
     }
 
     /**
@@ -93,8 +119,7 @@ public class BookService {
     private void validateCategory(Set<CategoryId> newCategoryIds) {
         Set<CategoryId> existingCategoryIds = categoryRepository.findAllIdsByIds(newCategoryIds);
         Set<CategoryId> nonExistingCategoryIds = new HashSet<>(newCategoryIds);
-        if(!existingCategoryIds.isEmpty())
-            nonExistingCategoryIds.removeAll(existingCategoryIds);
+        nonExistingCategoryIds.removeAll(existingCategoryIds);
 
         if (!nonExistingCategoryIds.isEmpty()) {
             throw new IllegalArgumentException("카테고리를 찾을 수 없습니다. 카테고리 ID: " +
@@ -104,22 +129,20 @@ public class BookService {
         }
     }
 
-//    @Transactional
-//    public void createBook(BookCreateRequest request){
-//
-//    }
+    private void saveBookCategories(BookId bookId, Set<CategoryId> categoryIds) {
+        List<BookCategory> bookCategories = new ArrayList<>();
+        categoryIds.forEach(categoryId ->
+                bookCategories.add(BookCategory.create(bookId, categoryId)));
+        bookCategoryRepository.saveAll(bookCategories);
+    }
 
-    // TODO 훼손, 분실 대여 중단
-    //  - 대여가능 여부 확인 isAvailableForRental
-    //  - 훼손, 분실로 변경 updateCategory
-
-    // --- 서칭 관련 ---
-    // TODO 카테고리별 도서 검색
-    // TODO 지은이, 제목 도서 검색
-
-    // --- 필요 ---
-    // TODO CRUD
-    //  - 도서 등록 - 요구사항: 신규도서는 항상 카테고리가 필요하다
-    //  - 도서 전체 업데이트?
-    // TODO Exception 커스텀
+    private void saveBookCategoriesForAllBook(Set<BookId> sameIsbnBookIds, Set<CategoryId> newCategoryIds) {
+        List<BookCategory> bookCategories = new ArrayList<>();
+        for (BookId bId : sameIsbnBookIds) {
+            for (CategoryId cId : newCategoryIds) {
+                bookCategories.add(BookCategory.create(bId, cId));
+            }
+        }
+        bookCategoryRepository.saveAll(bookCategories);
+    }
 }

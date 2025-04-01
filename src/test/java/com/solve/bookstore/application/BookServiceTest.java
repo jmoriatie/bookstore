@@ -1,5 +1,6 @@
 package com.solve.bookstore.application;
 
+import com.solve.bookstore.application.dto.BookCreateRequest;
 import com.solve.bookstore.application.dto.CategoryUpdateRequest;
 import com.solve.bookstore.domain.book.model.Book;
 import com.solve.bookstore.domain.book.model.BookId;
@@ -26,8 +27,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 
@@ -74,8 +74,59 @@ class BookServiceTest {
         }
 
         @Test
-        void saveBookCategory() {
+        @DisplayName("책 생성 - 성공")
+        void createBook_success() {
+            // given
+            Category category = new Category(new CategoryId("c3"), "NEW-CATEGORY-1");
+            Category savedCategory = categoryRepository.save(category);
 
+            // request
+            BookCreateRequest request = new BookCreateRequest(
+                    "책1",
+                    "일작가",
+                    "설설명명",
+                    "ISBN-aaa",
+                    List.of(category.getId().toString())
+            );
+
+            // when
+            Book savedBook = bookService.createBook(request);
+            List<BookCategory> foundBookCategories = bookCategoryRepository.findByBookId(savedBook.getId());
+            BookCategory foundBookCategory = foundBookCategories.get(0);
+
+            // then
+            assertEquals(foundBookCategories.size(),1);
+            assertEquals(foundBookCategory.getBookId(), savedBook.getId());
+            assertEquals(foundBookCategory.getCategoryId(), savedCategory.getId());
+        }
+
+        @Test
+        @DisplayName("도서 create - 카테고리 null, emptyList exception")
+        void createBook_nullCategory() {
+            // given
+            Category category = new Category(new CategoryId("c3"), "NEW-CATEGORY-1");
+            Category savedCategory = categoryRepository.save(category);
+
+            // request
+            BookCreateRequest emptyCategoryRequest = new BookCreateRequest(
+                    "책1",
+                    "일작가",
+                    "설설명명",
+                    "ISBN-aaa",
+                    List.of()
+            );
+
+            BookCreateRequest nullCategoryRequest = new BookCreateRequest(
+                    "책1",
+                    "일작가",
+                    "설설명명",
+                    "ISBN-aaa",
+                    null
+            );
+
+            // when & then
+            assertThrows(IllegalArgumentException.class, () -> bookService.createBook(emptyCategoryRequest));
+            assertThrows(IllegalArgumentException.class, () -> bookService.createBook(nullCategoryRequest));
         }
 
         @Test

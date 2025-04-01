@@ -26,15 +26,12 @@ public class Book {
     }
 
     private void validate(String title, String author, Isbn isbn){
-        if(title == null || title.trim().isEmpty()){
+        if(title == null || title.trim().isEmpty())
             throw new IllegalArgumentException("도서 제목은 필수 입니다.");
-        }
-        if(author == null || author.trim().isEmpty()){
+        if(author == null || author.trim().isEmpty())
             throw new IllegalArgumentException("저자는 필수 입니다.");
-        }
-        if(isbn == null){
+        if(isbn == null)
             throw new IllegalArgumentException("카테고리는 필수 입니다.");
-        }
     }
 
     public static Book create(String title, String author, String description, Isbn isbn){

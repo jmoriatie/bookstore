@@ -8,6 +8,7 @@ import java.util.Set;
 
 public interface CategoryRepository {
 
+    Category save(Category category);
     List<Category> saveAll(List<Category> categories);
     Category findById(CategoryId id);
     List<Category> findAllByIds(Set<CategoryId> ids);
