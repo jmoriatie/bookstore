@@ -30,6 +30,7 @@ public class BookService {
         this.bookCategoryRepository = bookCategoryRepository;
     }
 
+    // TODO 구현 -> 메서드 분리 -> Class 분리 단계별 리팩토링 필요
     // 요구사항
     // --- 도메인 기능 ---
     // 도서 카테고리 변경 가능 updateCategorys
@@ -39,14 +40,16 @@ public class BookService {
             return new CategoryChangedResponse(Collections.emptySet());
 
         Set<BookId> sameIsbnBookIds = getSameIsbnBooks(getBook(bookId));
-        Set<CategoryId> newCategoryIds = getCategoryIds(request); // 카테고리 찾기
-
+        Set<CategoryId> newCategoryIds = getCategoryIds(request);
         validateCategory(newCategoryIds);
 
-        int deletedRows = bookCategoryRepository.deleteBookIds(sameIsbnBookIds);// 북카테고리 삭제
-        log.debug("deletedRows={}",deletedRows);
+        bookCategoryRepository.deleteByBookIdIn(sameIsbnBookIds); // 연관관계 삭제
+        saveNewCategories(sameIsbnBookIds, newCategoryIds);
 
-        // 재등록
+        return new CategoryChangedResponse(sameIsbnBookIds);
+    }
+
+    private void saveNewCategories(Set<BookId> sameIsbnBookIds, Set<CategoryId> newCategoryIds) {
         List<BookCategory> newBookCategories = new ArrayList<>();
         for (BookId bId : sameIsbnBookIds) {
             for (CategoryId cId : newCategoryIds) {
@@ -54,8 +57,6 @@ public class BookService {
             }
         }
         bookCategoryRepository.saveAll(newBookCategories);
-
-        return new CategoryChangedResponse(sameIsbnBookIds);
     }
 
     /**

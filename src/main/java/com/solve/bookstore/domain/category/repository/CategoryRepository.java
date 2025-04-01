@@ -4,7 +4,6 @@ import com.solve.bookstore.domain.category.model.Category;
 import com.solve.bookstore.domain.category.model.CategoryId;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 
 public interface CategoryRepository {
@@ -13,6 +12,5 @@ public interface CategoryRepository {
     Category findById(CategoryId id);
     List<Category> findAllByIds(Set<CategoryId> ids);
     Set<CategoryId> findAllIdsByIds(Set<CategoryId> ids);
-
     void deleteAll();
 }

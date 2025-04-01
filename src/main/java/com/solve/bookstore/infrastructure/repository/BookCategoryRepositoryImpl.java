@@ -2,7 +2,6 @@ package com.solve.bookstore.infrastructure.repository;
 
 import com.solve.bookstore.domain.book.model.BookId;
 import com.solve.bookstore.domain.bookcategory.model.BookCategory;
-import com.solve.bookstore.domain.bookcategory.model.BookCategoryId;
 import com.solve.bookstore.domain.bookcategory.repository.BookCategoryRepository;
 import com.solve.bookstore.infrastructure.entity.BookCategoryEntity;
 import com.solve.bookstore.infrastructure.entity.BookEntity;
@@ -12,7 +11,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -59,10 +57,10 @@ public class BookCategoryRepositoryImpl implements BookCategoryRepository {
     }
 
     @Override
-    public int deleteBookIds(Set<BookId> bookIds) {
+    public int deleteByBookIdIn(Set<BookId> bookIds) {
         Set<String> idsStr = bookIds.stream()
                 .map(BookId::toString).collect(Collectors.toSet());
-        return bookCategoryJpaRepository.deleteByBookIdIn(idsStr);
+        return bookCategoryJpaRepository.deleteByBook_IdIn(idsStr);
     }
 
     @Override

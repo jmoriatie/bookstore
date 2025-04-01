@@ -2,10 +2,8 @@ package com.solve.bookstore.domain.book.repository;
 
 import com.solve.bookstore.domain.book.model.Book;
 import com.solve.bookstore.domain.book.model.BookId;
-import com.solve.bookstore.domain.category.model.Category;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 
 public interface BookRepository {
