@@ -1,6 +1,8 @@
 package com.solve.bookstore.application;
 
 import com.solve.bookstore.application.dto.BookCreateRequest;
+import com.solve.bookstore.application.dto.BookStatusChangeRequest;
+import com.solve.bookstore.application.dto.BookStatusChangeResponse;
 import com.solve.bookstore.application.dto.CategoryUpdateRequest;
 import com.solve.bookstore.domain.book.model.Book;
 import com.solve.bookstore.domain.book.model.BookId;
@@ -23,12 +25,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.support.TransactionTemplate;
 
 import java.util.List;
-import java.util.Optional;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
 
 
 @Slf4j
@@ -104,10 +103,6 @@ class BookServiceTest {
         @DisplayName("도서 create - 카테고리 null, emptyList exception")
         void createBook_nullCategory() {
             // given
-            Category category = new Category(new CategoryId("c3"), "NEW-CATEGORY-1");
-            Category savedCategory = categoryRepository.save(category);
-
-            // request
             BookCreateRequest emptyCategoryRequest = new BookCreateRequest(
                     "책1",
                     "일작가",
@@ -206,6 +201,78 @@ class BookServiceTest {
             assertTrue(foundNewCategories1Ids.contains(newCategory2.getId()));
             assertTrue(foundNewCategories2Ids.contains(newCategory1.getId()));
             assertTrue(foundNewCategories2Ids.contains(newCategory2.getId()));
+        }
+
+
+        @Test
+        @DisplayName("도서 상태 업데이트 - 성공")
+        void updateBookStatus_success(){
+            // given
+            Book book = Book.create(
+                            "책1",
+                            "일작가",
+                            "설설명명",
+                            new Isbn("ISBN-aaa"));
+            Book savedBook = bookRepository.save(book);
+
+            BookStatusChangeRequest request = new BookStatusChangeRequest("NOT_available");
+            // when
+            BookStatusChangeResponse updatedBook = bookService.updateAndSaveBookStatus(savedBook.getId().toString(), request);
+            // then
+            assertEquals(updatedBook.bookStatus(), BookStatus.NOT_AVAILABLE.name());
+            assertEquals("도서상태 변경 완료", updatedBook.message());
+        }
+
+        @Test
+        @DisplayName("도서 상태 업데이트 - 실패: 이미 손상된 도서")
+        void updateBookStatus_notAvailable(){
+            // given
+            Book book1 = Book.rebuild(
+                    new BookId("saved-b1"),
+                    "책1",
+                    "일작가",
+                    "설설명명",
+                    BookStatus.LOST,
+                    new Isbn("ISBN-aaa"));
+            Book lostedBook = bookRepository.save(book1);
+
+            Book book2 = Book.rebuild(
+                    new BookId("saved-b2"),
+                    "책1",
+                    "일작가",
+                    "설설명명",
+                    BookStatus.DAMAGED,
+                    new Isbn("ISBN-aaa"));
+            Book damagedBook = bookRepository.save(book2);
+
+            BookStatusChangeRequest request = new BookStatusChangeRequest("NOT_available"); // toUppercase도 확인
+
+            // when
+            BookStatusChangeResponse lostedBookResponse
+                    = bookService.updateAndSaveBookStatus(lostedBook.getId().toString(), request);
+            BookStatusChangeResponse damagedBookResponse
+                    = bookService.updateAndSaveBookStatus(damagedBook.getId().toString(), request);
+            // then
+            assertEquals(lostedBookResponse.bookStatus(), book1.getStatus().name()); // 기존 유지
+            assertEquals(damagedBookResponse.bookStatus(), book2.getStatus().name());
+            assertEquals(lostedBookResponse.message(), "이미 대여가 불가한 도서입니다.");
+            assertEquals(damagedBookResponse.message(), "이미 대여가 불가한 도서입니다.");
+        }
+
+        @Test
+        @DisplayName("도서 상태 업데이트 - 오류: 없는 이름")
+        void updateBookStatus_faultBookStatus(){
+            // given
+            Book book = Book.create(
+                    "책1",
+                    "일작가",
+                    "설설명명",
+                    new Isbn("ISBN-aaa"));
+            Book savedBook = bookRepository.save(book);
+
+            BookStatusChangeRequest request = new BookStatusChangeRequest("Wrong_BOOK");
+            // when & then
+            assertThrows(IllegalArgumentException.class, () -> bookService.updateAndSaveBookStatus(savedBook.getId().toString(), request));
         }
     }
 }

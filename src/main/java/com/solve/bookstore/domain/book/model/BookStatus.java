@@ -15,4 +15,16 @@ public enum BookStatus {
     BookStatus(String status) {
         this.status = status;
     }
+
+    public static BookStatus fromStr(String status){
+        try {
+            return BookStatus.valueOf(status.toUpperCase());
+        } catch (IllegalArgumentException e) {
+            throw new IllegalArgumentException("없는 도서상태 값 입니다. statusStr: "+status);
+        }
+    }
+
+    public boolean isNotAvailable(){
+        return this == NOT_AVAILABLE || this == LOST || this == DAMAGED;
+    }
 }

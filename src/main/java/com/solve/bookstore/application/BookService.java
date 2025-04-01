@@ -1,10 +1,9 @@
 package com.solve.bookstore.application;
 
-import com.solve.bookstore.application.dto.BookCreateRequest;
-import com.solve.bookstore.application.dto.CategoryChangedResponse;
-import com.solve.bookstore.application.dto.CategoryUpdateRequest;
+import com.solve.bookstore.application.dto.*;
 import com.solve.bookstore.domain.book.model.Book;
 import com.solve.bookstore.domain.book.model.BookId;
+import com.solve.bookstore.domain.book.model.BookStatus;
 import com.solve.bookstore.domain.book.repository.BookRepository;
 import com.solve.bookstore.domain.bookcategory.model.BookCategory;
 import com.solve.bookstore.domain.bookcategory.repository.BookCategoryRepository;
@@ -25,31 +24,23 @@ public class BookService {
     private final CategoryRepository categoryRepository;
     private final BookCategoryRepository bookCategoryRepository;
 
-    public BookService(BookRepository bookRepository, CategoryRepository categoryRepository, BookCategoryRepository bookCategoryRepository) {
+    private final BookSearchService bookSearchService;
+
+    public BookService(BookRepository bookRepository, CategoryRepository categoryRepository, BookCategoryRepository bookCategoryRepository, BookSearchService bookSearchService) {
         this.bookRepository = bookRepository;
         this.categoryRepository = categoryRepository;
         this.bookCategoryRepository = bookCategoryRepository;
+        this.bookSearchService = bookSearchService;
     }
 
     // TODO 구현 -> 메서드 분리 -> Class 분리 단계별 리팩토링 필요
-    // 요구사항
-    // --- 도메인 기능 ---
-    // 도서 카테고리 변경 가능 updateCategorys
-    @Transactional
-    public CategoryChangedResponse changeCategories(String bookId, CategoryUpdateRequest request) {
-        if (hasNoCategories(request.categoryIds()))
-            return new CategoryChangedResponse(Collections.emptySet());
+    //  도메인서비스 -> categoryService : validation, id 확인 등 분리
+    //  도메인서비스 -> bookCategoryService? domain 분리?
 
-        Set<BookId> sameIsbnBookIds = getSameIsbnBooks(getBook(bookId));
-        Set<CategoryId> newCategoryIds = getCategoryIds(request);
-        validateCategory(newCategoryIds);
-
-        bookCategoryRepository.deleteByBookIdIn(sameIsbnBookIds); // 연관관계 삭제
-        saveBookCategoriesForAllBook(sameIsbnBookIds, newCategoryIds);
-
-        return new CategoryChangedResponse(sameIsbnBookIds);
-    }
-
+    /**
+     * 도서 등록
+     * 요구사항: 신규도서는 항상 카테고리가 필요하다
+     */
     @Transactional
     public Book createBook(BookCreateRequest request){
         if(hasNoCategories(request.categoryIds()))
@@ -68,20 +59,51 @@ public class BookService {
         return savedBook;
     }
 
+    /**
+     * 도서 카테고리 변경
+     * 요구사항: 도서는 카테고리를 변경할 수 있음, 도서는 카테고리를 2개 이상 가질 수 있음
+     */
+    @Transactional
+    public CategoryChangedResponse changeCategories(String bookId, CategoryUpdateRequest request) {
+        if (hasNoCategories(request.categoryIds()))
+            return new CategoryChangedResponse(Collections.emptySet());
 
+        Set<BookId> sameIsbnBookIds = bookSearchService.getSameIsbnBooks(getBook(bookId));
+        Set<CategoryId> newCategoryIds = getCategoryIds(request);
+        validateCategory(newCategoryIds);
+
+        bookCategoryRepository.deleteByBookIdIn(sameIsbnBookIds); // 연관관계 삭제
+        saveBookCategoriesForAllBook(sameIsbnBookIds, newCategoryIds);
+
+        return new CategoryChangedResponse(sameIsbnBookIds);
+    }
     // TODO 훼손, 분실 대여 중단
-    //  - 대여가능 여부 확인 isAvailableForRental
-    //  - 훼손, 분실로 변경 updateCategory
-
-    // --- 서칭 관련 ---
-    // TODO 카테고리별 도서 검색
-    // TODO 지은이, 제목 도서 검색
+    //  - 대여 불가로 변경 여부 확인 isAvailableForRental
 
     // --- 필요 ---
-    // TODO CRUD
-    //  - 도서 등록 - 요구사항: 신규도서는 항상 카테고리가 필요하다
-    //  - 도서 전체 업데이트?
+    // TODO CRUD 더?
     // TODO Exception 커스텀
+
+    /**
+     * 도서 상태 업데이트
+     * 요구사항: 훼손, 분실로 도서 상태 변경
+     */
+    @Transactional
+    public BookStatusChangeResponse updateAndSaveBookStatus(String bookId, BookStatusChangeRequest request) {
+        Book book = bookRepository.findById(new BookId(bookId));
+        if(book.getStatus().isNotAvailable())
+            return BookStatusChangeResponse.notAvailable(book.getId().toString(), book.getStatus().name());
+
+        Book savedBook = updateAndSaveBookStatus(request, book);
+
+        return BookStatusChangeResponse.success(savedBook.getId().toString(), savedBook.getStatus().name());
+    }
+
+    private Book updateAndSaveBookStatus(BookStatusChangeRequest request, Book book) {
+        BookStatus bookStatus = BookStatus.fromStr(request.bookStatus());
+        book.updateStatus(bookStatus);
+        return bookRepository.save(book);
+    }
 
     /**
      * request에 category 유무 확인
@@ -103,15 +125,6 @@ public class BookService {
         return bookRepository.findById(new BookId(bookId));
     }
 
-    /**
-     * 동일 ISBN 을 가진 도서들 찾기
-     */
-    private Set<BookId> getSameIsbnBooks(Book book) {
-        List<Book> sameIsbnBooks = bookRepository.findByIsbn(book.getIsbn().toString()); // isbn 으로 전체 찾기
-        return sameIsbnBooks.stream()
-                .map(Book::getId)
-                .collect(Collectors.toSet());
-    }
 
     /**
      * 존재하지 않는 카테고리 ID validation

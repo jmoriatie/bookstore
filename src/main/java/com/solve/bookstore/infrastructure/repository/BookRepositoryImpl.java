@@ -30,16 +30,6 @@ public class BookRepositoryImpl implements BookRepository {
     }
 
     @Override
-    public List<BookId> saveAll(List<Book> books) {
-        return null;
-    }
-
-    @Override
-    public List<BookId> saveAll(Set<Book> books) {
-        return null;
-    }
-
-    @Override
     public List<Book> findAllByIds(List<BookId> ids) {
         return null;
     }
