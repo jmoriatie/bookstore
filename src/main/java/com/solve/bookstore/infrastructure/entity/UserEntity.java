@@ -21,6 +21,15 @@ public class UserEntity extends BaseEntity {
     @Id
     private String id;
 
+    private String name;
+    private String tel;
+
     @OneToMany(mappedBy = "rentalUser")
     List<RentalEntity> rentals = new ArrayList<>();
+
+    public UserEntity(String id, String name, String tel) {
+        this.id = id;
+        this.name = name;
+        this.tel = tel;
+    }
 }

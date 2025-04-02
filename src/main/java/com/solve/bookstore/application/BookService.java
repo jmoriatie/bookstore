@@ -108,7 +108,7 @@ public class BookService {
         return BookStatusChangeResponse.success(savedBook.getId().toString(), savedBook.getStatus().name());
     }
 
-    private void updateBookStatus(String updateStatus, Book book) {
+    public void updateBookStatus(String updateStatus, Book book) {
         BookStatus bookStatus = BookStatus.fromStr(updateStatus);
         book.updateStatus(bookStatus);
     }

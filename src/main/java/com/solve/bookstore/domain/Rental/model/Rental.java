@@ -21,7 +21,7 @@ public class Rental {
     public Rental(RentalId id, BookId bookId, UserId rentalUserId, LocalDateTime rentalDate, LocalDateTime expectedReturnDate) {
         validate(bookId, rentalUserId, rentalDate, expectedReturnDate);
 
-        this.id = id != null? id : new RentalId();
+        this.id = new RentalId();
         this.bookId = bookId;
         this.rentalUserId = rentalUserId;
         this.rentalDate = rentalDate;
@@ -53,8 +53,8 @@ public class Rental {
         }
     }
 
-    public static Rental create(RentalId id, BookId bookId, UserId rentalUserId, LocalDateTime rentalDate, LocalDateTime expectedReturnDate){
-        return new Rental(id, bookId, rentalUserId, rentalDate, expectedReturnDate);
+    public static Rental create(BookId bookId, UserId rentalUserId, LocalDateTime rentalDate, LocalDateTime expectedReturnDate){
+        return new Rental(null, bookId, rentalUserId, rentalDate, expectedReturnDate);
     }
 
     public static Rental rebuild(RentalId id, BookId bookId, UserId rentalUserId, LocalDateTime rentalDate, LocalDateTime returnDate, LocalDateTime expectedReturnDate, RentalStatus status){
