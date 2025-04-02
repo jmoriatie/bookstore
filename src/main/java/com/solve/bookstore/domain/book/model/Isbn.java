@@ -1,7 +1,8 @@
 package com.solve.bookstore.domain.book.model;
 
-import lombok.Getter;
+import lombok.EqualsAndHashCode;
 
+@EqualsAndHashCode
 public class Isbn {
     String serialNumber;
 

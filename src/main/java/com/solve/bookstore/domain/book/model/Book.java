@@ -1,10 +1,5 @@
 package com.solve.bookstore.domain.book.model;
-import com.solve.bookstore.domain.Rental.model.Rental;
-import com.solve.bookstore.domain.category.model.Category;
-import lombok.Builder;
 import lombok.Getter;
-
-import java.util.List;
 
 @Getter
 public class Book {
@@ -38,6 +33,17 @@ public class Book {
         return new Book(null, title, author, description, BookStatus.AVAILABLE, isbn);
     }
 
+    public static Book createFromExistBook(Book existBook){
+        return new Book(
+                null,
+                existBook.getTitle(),
+                existBook.getAuthor(),
+                existBook.getDescription(),
+                BookStatus.AVAILABLE,
+                existBook.getIsbn()
+        );
+    }
+
     public static Book rebuild(BookId id, String title, String author, String description, BookStatus status, Isbn isbn){
         return new Book(id, title, author, description, status, isbn);
     }
@@ -59,7 +65,7 @@ public class Book {
         this.status = BookStatus.RENTED;
     }
     // 반납
-    public void returnBook(Rental rental){
+    public void returnBook(){
         this.status = BookStatus.AVAILABLE;
     }
 }

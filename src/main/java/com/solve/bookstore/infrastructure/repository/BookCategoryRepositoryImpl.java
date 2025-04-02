@@ -3,6 +3,7 @@ package com.solve.bookstore.infrastructure.repository;
 import com.solve.bookstore.domain.book.model.BookId;
 import com.solve.bookstore.domain.bookcategory.model.BookCategory;
 import com.solve.bookstore.domain.bookcategory.repository.BookCategoryRepository;
+import com.solve.bookstore.domain.category.model.CategoryId;
 import com.solve.bookstore.infrastructure.entity.BookCategoryEntity;
 import com.solve.bookstore.infrastructure.entity.BookEntity;
 import com.solve.bookstore.infrastructure.entity.CategoryEntity;
@@ -29,6 +30,14 @@ public class BookCategoryRepositoryImpl implements BookCategoryRepository {
     @Override
     public List<BookCategory> findByBookIds(Set<BookId> bookIds) {
         return null;
+    }
+
+    @Override
+    public Set<CategoryId> findCategoryIdByBookIdIn(BookId bookId) {
+        Set<String> categoryIdsStr = bookCategoryJpaRepository.findCategory_IdByBook_IdIn(bookId.toString());
+        return categoryIdsStr.stream()
+                .map(CategoryId::new)
+                .collect(Collectors.toSet());
     }
 
     @Override

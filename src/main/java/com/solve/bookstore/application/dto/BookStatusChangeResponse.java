@@ -10,6 +10,6 @@ public record BookStatusChangeResponse(
     }
 
     public static BookStatusChangeResponse notAvailable(String bookId, String bookStatus){
-        return new BookStatusChangeResponse(bookId, bookStatus, "이미 대여가 불가한 도서입니다.");
+        return new BookStatusChangeResponse(bookId, bookStatus, "대여불가 상태의 도서입니다.");
     }
 }

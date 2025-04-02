@@ -1,31 +1,31 @@
 package com.solve.bookstore.infrastructure.repository;
 
 import com.solve.bookstore.domain.book.model.BookId;
+import com.solve.bookstore.domain.book.model.Isbn;
 import com.solve.bookstore.domain.bookcategory.model.BookCategory;
 import com.solve.bookstore.domain.category.model.CategoryId;
 import com.solve.bookstore.infrastructure.entity.BookCategoryEntity;
 import com.solve.bookstore.infrastructure.entity.BookEntity;
 import com.solve.bookstore.infrastructure.entity.CategoryEntity;
 import com.solve.bookstore.infrastructure.repository.mapper.BookCategoryMapper;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.transaction.support.TransactionTemplate;
 
 import java.util.Optional;
+import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
-@ExtendWith(MockitoExtension.class)
+@Slf4j
 class BookCategoryRepositoryImplTest {
 
     // 더미 데이터
@@ -40,7 +40,10 @@ class BookCategoryRepositoryImplTest {
 
 
     @Nested
-    @SpringBootTest
+    @SpringBootTest(properties = {
+            "logging.level.com.solve.bookstore.application=DEBUG",
+            "logging.level.com.solve.bookstore.infrastructure=DEBUG"
+    })
     class classicTest {
         @Autowired
         private BookCategoryJpaRepository bookCategoryJpaRepository;
@@ -56,6 +59,10 @@ class BookCategoryRepositoryImplTest {
             bookCategoryJpaRepository.deleteAll();
             bookJpaRepository.deleteAll();
             categoryJpaRepository.deleteAll();
+
+            log.debug("### success bookRepository.deleteAll()");
+            log.debug("### success categoryRepository.deleteAll()");
+            log.debug("### success bookCategoryRepository.deleteAll()");
 
             bookId = new BookId("book-1");
             categoryId = new CategoryId("category-1");
@@ -82,6 +89,35 @@ class BookCategoryRepositoryImplTest {
             assertEquals(result.getBookId().toString(), savedBook.getId());
             assertEquals(result.getCategoryId().toString(), savedCategory.getId());
         }
+
+        @Test
+        @DisplayName("BookCategory로 부터 Category Ids 찾기")
+        void findCategoryIdByBookIdIn(){
+            // given
+            CategoryId categoryId1 = new CategoryId("category-1");
+            CategoryId categoryId2 = new CategoryId("category-2");
+
+            bookEntity = BookEntity.create(bookId.toString(), "제목1", "작가1", null, "isbn-1");
+            bookJpaRepository.save(bookEntity);
+
+            CategoryEntity categoryEntity1 = categoryJpaRepository.save(CategoryEntity.create(categoryId1.toString(), "카테고리-1"));
+            CategoryEntity categoryEntity2 = categoryJpaRepository.save(CategoryEntity.create(categoryId2.toString(), "카테고리-2"));
+
+            BookCategoryEntity bookCategoryEntity1 = BookCategoryEntity.create(bookEntity, categoryEntity1);
+            BookCategoryEntity bookCategoryEntity2 = BookCategoryEntity.create(bookEntity, categoryEntity2);
+
+            bookCategoryJpaRepository.save(bookCategoryEntity1);
+            bookCategoryJpaRepository.save(bookCategoryEntity2);
+
+            // when
+            Set<String> foundCategoryIds = bookCategoryJpaRepository.findCategory_IdByBook_IdIn(bookId.toString());
+            foundCategoryIds.forEach(log::debug);
+
+            //then
+            assertTrue(foundCategoryIds.contains(categoryId1.toString()));
+            assertTrue(foundCategoryIds.contains(categoryId2.toString()));
+        }
+
     }
 
     @Nested

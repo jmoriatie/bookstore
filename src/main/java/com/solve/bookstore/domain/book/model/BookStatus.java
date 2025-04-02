@@ -24,6 +24,14 @@ public enum BookStatus {
         }
     }
 
+    public boolean isAvailable(){
+        return this == AVAILABLE;
+    }
+
+    public boolean isRented(){
+        return this == RENTED;
+    }
+
     public boolean isNotAvailable(){
         return this == NOT_AVAILABLE || this == LOST || this == DAMAGED;
     }

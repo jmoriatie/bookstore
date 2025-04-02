@@ -2,8 +2,8 @@ package com.solve.bookstore.infrastructure.repository;
 
 import com.solve.bookstore.domain.book.model.Book;
 import com.solve.bookstore.domain.book.model.BookId;
+import com.solve.bookstore.domain.book.model.Isbn;
 import com.solve.bookstore.domain.book.repository.BookRepository;
-import com.solve.bookstore.domain.category.model.Category;
 import com.solve.bookstore.infrastructure.entity.BookEntity;
 import com.solve.bookstore.infrastructure.repository.mapper.BookMapper;
 import lombok.RequiredArgsConstructor;
@@ -11,8 +11,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
-import java.util.Optional;
-import java.util.Set;
 
 @Repository
 @Slf4j
@@ -30,16 +28,6 @@ public class BookRepositoryImpl implements BookRepository {
     }
 
     @Override
-    public List<Book> findAllByIds(List<BookId> ids) {
-        return null;
-    }
-
-    @Override
-    public List<Book> findAllByIds(Set<BookId> ids) {
-        return null;
-    }
-
-    @Override
     public Book findById(BookId id) {
         BookEntity entity = bookJpaRepository.findById(id.toString())
                 .orElseThrow(() -> new IllegalArgumentException("없는 도서 ID 입니다. ID: " + id));
@@ -47,8 +35,8 @@ public class BookRepositoryImpl implements BookRepository {
     }
 
     @Override
-    public List<Book> findByIsbn(String isbn) {
-        List<BookEntity> entities = bookJpaRepository.findByIsbn(isbn);
+    public List<Book> findByIsbn(Isbn isbn) {
+        List<BookEntity> entities = bookJpaRepository.findByIsbn(isbn.toString());
         entities.forEach(b -> log.debug("### found book with ISBN id={} isbn={}", b.getId(), b.getIsbn()));
         return entities.stream()
                 .map(bookMapper::toDomain)

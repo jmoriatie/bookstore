@@ -17,5 +17,8 @@ public interface BookCategoryJpaRepository extends JpaRepository<BookCategoryEnt
     @Query("DELETE FROM BookCategoryEntity bc WHERE bc.book.id IN :bookIds")
     int deleteByBook_IdIn(Set<String> bookIds);
 
+    @Query("SELECT bc.category.id FROM BookCategoryEntity bc WHERE bc.book.id = :bookId")
+    Set<String> findCategory_IdByBook_IdIn(String bookId);
+
     List<BookCategoryEntity> findByBook_Id(String bookId);
 }

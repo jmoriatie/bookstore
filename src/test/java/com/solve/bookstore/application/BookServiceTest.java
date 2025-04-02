@@ -100,6 +100,52 @@ class BookServiceTest {
         }
 
         @Test
+        @DisplayName("책 생성 - 동일 ISBN 있는 도서")
+        void createBook_success_existBook() {
+            // given
+            Category existCategory = new Category(new CategoryId("c1"), "Exist-CATEGORY-1");
+            Category savedExistcategory = categoryRepository.save(existCategory);
+
+            Category newCategory = new Category(new CategoryId("c2"), "NEW-CATEGORY-1");
+            Category savedNewCategory = categoryRepository.save(newCategory);
+
+            Isbn isbn = new Isbn("ISBN-same");
+            Book book = Book.create(
+                    "존재하던 책",
+                    "존재하던 작가",
+                    "책설명",
+                    isbn);
+            Book existBook = bookRepository.save(book);
+
+            BookCategory existBookCategory = BookCategory.create(existBook.getId(), savedExistcategory.getId());
+            bookCategoryRepository.save(existBookCategory);
+
+            List<BookCategory> existBookCategories = bookCategoryRepository.findByBookId(existBook.getId());
+            BookCategory savedExistBookCategory = existBookCategories.get(0);
+
+            // request
+            BookCreateRequest request = new BookCreateRequest(
+                    "새로운 책",
+                    "새로운 작가",
+                    "설설명명",
+                    isbn.toString(),
+                    List.of(savedNewCategory.getId().toString())
+            );
+
+            // when
+            Book savedBook = bookService.createBook(request);
+
+            List<BookCategory> foundBookCategories = bookCategoryRepository.findByBookId(savedBook.getId());
+            BookCategory foundBookCategory = foundBookCategories.get(0);
+
+            // then
+            assertEquals(existBook.getTitle(), savedBook.getTitle());
+            assertEquals(existBook.getAuthor(), savedBook.getAuthor());
+            assertEquals(existBook.getIsbn(), savedBook.getIsbn());
+            assertEquals(foundBookCategory.getCategoryId(), existBookCategory.getCategoryId());
+        }
+
+        @Test
         @DisplayName("도서 create - 카테고리 null, emptyList exception")
         void createBook_nullCategory() {
             // given
