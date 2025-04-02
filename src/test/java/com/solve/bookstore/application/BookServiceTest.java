@@ -1,9 +1,6 @@
 package com.solve.bookstore.application;
 
-import com.solve.bookstore.application.dto.BookCreateRequest;
-import com.solve.bookstore.application.dto.BookStatusChangeRequest;
-import com.solve.bookstore.application.dto.BookStatusChangeResponse;
-import com.solve.bookstore.application.dto.CategoryUpdateRequest;
+import com.solve.bookstore.application.dto.*;
 import com.solve.bookstore.domain.book.model.Book;
 import com.solve.bookstore.domain.book.model.BookId;
 import com.solve.bookstore.domain.book.model.BookStatus;
@@ -32,17 +29,6 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @Slf4j
 class BookServiceTest {
-
-    @Nested
-    @ExtendWith(MockitoExtension.class)
-    class MockitoTest {
-        @InjectMocks
-        BookService bookService;
-        @Mock
-        BookRepository bookRepository;
-        @Mock
-        CategoryRepository categoryRepository;
-    }
 
     @Nested
     @SpringBootTest(properties = {
@@ -89,13 +75,13 @@ class BookServiceTest {
             );
 
             // when
-            Book savedBook = bookService.createBook(request);
-            List<BookCategory> foundBookCategories = bookCategoryRepository.findByBookId(savedBook.getId());
+            BookCreatedResponse response = bookService.createBook(request);
+            List<BookCategory> foundBookCategories = bookCategoryRepository.findByBookId(new BookId(response.bookId()));
             BookCategory foundBookCategory = foundBookCategories.get(0);
 
             // then
             assertEquals(foundBookCategories.size(),1);
-            assertEquals(foundBookCategory.getBookId(), savedBook.getId());
+            assertEquals(foundBookCategory.getBookId(), new BookId(response.bookId()));
             assertEquals(foundBookCategory.getCategoryId(), savedCategory.getId());
         }
 
@@ -133,9 +119,10 @@ class BookServiceTest {
             );
 
             // when
-            Book savedBook = bookService.createBook(request);
+            BookCreatedResponse response = bookService.createBook(request);
 
-            List<BookCategory> foundBookCategories = bookCategoryRepository.findByBookId(savedBook.getId());
+            Book savedBook = bookRepository.findById(new BookId(response.bookId()));
+            List<BookCategory> foundBookCategories = bookCategoryRepository.findByBookId(new BookId(response.bookId()));
             BookCategory foundBookCategory = foundBookCategories.get(0);
 
             // then
@@ -267,42 +254,6 @@ class BookServiceTest {
             // then
             assertEquals(updatedBook.bookStatus(), BookStatus.NOT_AVAILABLE.name());
             assertEquals("도서상태 변경 완료", updatedBook.message());
-        }
-
-        @Test
-        @DisplayName("도서 상태 업데이트 - 실패: 이미 손상된 도서")
-        void updateBookStatus_notAvailable(){
-            // given
-            Book book1 = Book.rebuild(
-                    new BookId("saved-b1"),
-                    "책1",
-                    "일작가",
-                    "설설명명",
-                    BookStatus.LOST,
-                    new Isbn("ISBN-aaa"));
-            Book lostedBook = bookRepository.save(book1);
-
-            Book book2 = Book.rebuild(
-                    new BookId("saved-b2"),
-                    "책1",
-                    "일작가",
-                    "설설명명",
-                    BookStatus.DAMAGED,
-                    new Isbn("ISBN-aaa"));
-            Book damagedBook = bookRepository.save(book2);
-
-            BookStatusChangeRequest request = new BookStatusChangeRequest("NOT_available"); // toUppercase도 확인
-
-            // when
-            BookStatusChangeResponse lostedBookResponse
-                    = bookService.updateAndSaveBookStatus(lostedBook.getId().toString(), request);
-            BookStatusChangeResponse damagedBookResponse
-                    = bookService.updateAndSaveBookStatus(damagedBook.getId().toString(), request);
-            // then
-            assertEquals(lostedBookResponse.bookStatus(), book1.getStatus().name()); // 기존 유지
-            assertEquals(damagedBookResponse.bookStatus(), book2.getStatus().name());
-            assertEquals(lostedBookResponse.message(), "이미 대여가 불가한 도서입니다.");
-            assertEquals(damagedBookResponse.message(), "이미 대여가 불가한 도서입니다.");
         }
 
         @Test

@@ -72,7 +72,6 @@ public class BookService {
         Book savedBook = bookRepository.save(saveBook);
 
         saveBookCategories(savedBook.getId(), categoryIds); // BookCategory 연관관계 저장
-
         return BookCreatedResponse.from(savedBook.getId().toString(), savedBook.getStatus().name(), message);
     }
 
@@ -102,8 +101,6 @@ public class BookService {
     @Transactional
     public BookStatusChangeResponse updateAndSaveBookStatus(String bookId, BookStatusChangeRequest request) {
         Book book = bookRepository.findById(new BookId(bookId));
-        if(book.getStatus().isNotAvailable())
-            return BookStatusChangeResponse.notAvailable(book.getId().toString(), book.getStatus().name());
 
         BookStatus bookStatus = BookStatus.fromStr(request.bookStatus());
         book.updateStatus(bookStatus);

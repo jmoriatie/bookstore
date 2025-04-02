@@ -18,6 +18,8 @@ public class RentalService {
     }
 
 
+    // TODO 구현 -> 메서드 분리 -> Class 분리 단계별 리팩토링 필요
+
     // TODO 훼손, 분실 대여 중단
     //  - 대여 불가로 변경 여부 확인 isAvailableForRental
 
@@ -26,9 +28,15 @@ public class RentalService {
     // TODO Exception 커스텀
 
     // NOTE 카운터에서 대여 관리자가 바코드를 찍고 입력하는 등의 시나리오
-    // 대여
-    // 동일한 대여가능 책
-    // 대여 가능 여부 확인
+    // TODO 서치한 책과 동일한 대여가능 책 확인 - ISBN
+    //  count & 실제 대여 가능 책 있는지 여부 확인
+
+    /**
+     * 도서 대여
+     */
+    public void rent(){
+        // 대여 가능 여부 확인
+    }
 
     /**
      * 도서 반납
@@ -39,8 +47,6 @@ public class RentalService {
         Book book = bookRepository.findById(new BookId(bookId));
         if(book.getStatus().isAvailable())
             throw new RuntimeException("대여되지 않은 도서 입니다. ID: "+bookId);
-        if(book.getStatus().isNotAvailable())
-            return BookStatusChangeResponse.notAvailable(book.getId().toString(), book.getStatus().name());
 
         book.returnBook();
         Book savedBook =  bookRepository.save(book);
