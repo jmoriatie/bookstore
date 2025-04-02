@@ -34,4 +34,18 @@ public class RentalEntity extends BaseEntity {
 
     @Column(nullable = false)
     private RentalStatus status; // 대여상태
+
+    private RentalEntity(String id, BookEntity book, UserEntity rentalUser, LocalDateTime rentalDate, LocalDateTime expectedReturnDate, LocalDateTime returnDate, RentalStatus status) {
+        this.id = id;
+        this.book = book;
+        this.rentalUser = rentalUser;
+        this.rentalDate = rentalDate;
+        this.expectedReturnDate = expectedReturnDate;
+        this.returnDate = returnDate;
+        this.status = status;
+    }
+
+    public static RentalEntity from(String id, BookEntity book, UserEntity rentalUser, LocalDateTime rentalDate, LocalDateTime expectedReturnDate, LocalDateTime returnDate, RentalStatus status){
+        return new RentalEntity(id, book, rentalUser, rentalDate, expectedReturnDate, returnDate, status);
+    }
 }

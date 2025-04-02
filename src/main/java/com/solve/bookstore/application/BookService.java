@@ -73,7 +73,7 @@ public class BookService {
 
         saveBookCategories(savedBook.getId(), categoryIds); // BookCategory 연관관계 저장
 
-        return BookCreatedResponse.from(savedBook.getId().toString(), savedBook.getStatus().name(), message);;
+        return BookCreatedResponse.from(savedBook.getId().toString(), savedBook.getStatus().name(), message);
     }
 
     /**

@@ -16,6 +16,8 @@ public class Rental {
     private LocalDateTime returnDate; // 실제 반납일자
     private RentalStatus status; // 대여상태
 
+
+    // 신규 대여 생성
     public Rental(RentalId id, BookId bookId, UserId rentalUserId, LocalDateTime rentalDate, LocalDateTime expectedReturnDate) {
         validate(bookId, rentalUserId, rentalDate, expectedReturnDate);
 
@@ -25,6 +27,17 @@ public class Rental {
         this.rentalDate = rentalDate;
         this.expectedReturnDate = expectedReturnDate;
         this.status = RentalStatus.ACTIVE;
+    }
+
+    // rebuild
+    public Rental(RentalId id, BookId bookId, UserId rentalUserId, LocalDateTime rentalDate, LocalDateTime returnDate, LocalDateTime expectedReturnDate, RentalStatus status) {
+        this.id = id;
+        this.bookId = bookId;
+        this.rentalUserId = rentalUserId;
+        this.rentalDate = rentalDate;
+        this.expectedReturnDate = expectedReturnDate;
+        this.returnDate = returnDate;
+        this.status = status;
     }
 
     private void validate(BookId bookId, UserId rentalUserId, LocalDateTime rentalDate, LocalDateTime expectedReturnDat){
@@ -38,6 +51,19 @@ public class Rental {
         if(expectedReturnDat.isBefore(rentalDate)){
             throw new IllegalArgumentException("반납 예정 일자는 대여일자 이후로 설정해주세요.");
         }
+    }
+
+    public static Rental create(RentalId id, BookId bookId, UserId rentalUserId, LocalDateTime rentalDate, LocalDateTime expectedReturnDate){
+        return new Rental(id, bookId, rentalUserId, rentalDate, expectedReturnDate);
+    }
+
+    public static Rental rebuild(RentalId id, BookId bookId, UserId rentalUserId, LocalDateTime rentalDate, LocalDateTime returnDate, LocalDateTime expectedReturnDate, RentalStatus status){
+        return new Rental(id, bookId, rentalUserId, rentalDate, returnDate, expectedReturnDate, status);
+    }
+
+    // 상태 변경
+    public void updateStatus(RentalStatus status){
+        this.status = status;
     }
 
     public void returnCompleted(){
