@@ -1,6 +1,8 @@
 package com.solve.bookstore.application;
 
 import com.solve.bookstore.application.dto.BookStatusChangeResponse;
+import com.solve.bookstore.application.dto.ReturnBookResponse;
+import com.solve.bookstore.domain.Rental.model.Rental;
 import com.solve.bookstore.domain.Rental.repository.RentalRepository;
 import com.solve.bookstore.domain.book.model.Book;
 import com.solve.bookstore.domain.book.model.BookId;
@@ -11,10 +13,12 @@ public class RentalService {
 
     private final BookRepository bookRepository;
     private final RentalRepository rentalRepository;
+    private final BookService bookService;
 
-    public RentalService(BookRepository bookRepository, RentalRepository rentalRepository) {
+    public RentalService(BookRepository bookRepository, RentalRepository rentalRepository, BookService bookService) {
         this.bookRepository = bookRepository;
         this.rentalRepository = rentalRepository;
+        this.bookService = bookService;
     }
 
 
@@ -38,21 +42,33 @@ public class RentalService {
         // 대여 가능 여부 확인
     }
 
+    // TODO TEST
     /**
      * 도서 반납
      * 요구사항: 훼손, 분실로 도서 상태 변경
      */
     @Transactional
-    public BookStatusChangeResponse returnBook(String bookId) {
-        Book book = bookRepository.findById(new BookId(bookId));
+    public ReturnBookResponse returnBook(String bookId) {
+        Book book = bookService.getBook(bookId);
         if(book.getStatus().isAvailable())
             throw new RuntimeException("대여되지 않은 도서 입니다. ID: "+bookId);
 
+        // Rental 로직
+        validateReturnHistory(book.getId());
+        Rental rental = rentalRepository.findTopByBookId(book.getId());
+        rental.returnCompleted();
+        rentalRepository.saveForUpdate(rental);
+
+        // Book 로직
         book.returnBook();
         Book savedBook =  bookRepository.save(book);
 
-        // TODO Rental domain 컨트롤
+        return ReturnBookResponse.success(savedBook.getId().toString(), savedBook.getTitle());
+    }
 
-        return BookStatusChangeResponse.success(savedBook.getId().toString(), savedBook.getStatus().name());
+    private void validateReturnHistory(BookId bookId) {
+        Long rentalCount = rentalRepository.countByBookIdInAndReturnDateNull(bookId);
+        if(rentalCount > 1)
+            throw new RuntimeException("미반납 이력이 2개 이상입니다. 대여이력을 확인하세요 bookId: "+ bookId.toString());
     }
 }

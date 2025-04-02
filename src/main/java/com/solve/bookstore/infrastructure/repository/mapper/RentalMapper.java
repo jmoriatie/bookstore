@@ -16,6 +16,7 @@ public class RentalMapper {
      * Entity -> Domain
      */
     public Rental toDomain(RentalEntity entity){
+        if(entity == null) return null;
         return Rental.rebuild(
                 new RentalId(entity.getId()),
                 new BookId(entity.getBook().getId()),
@@ -31,6 +32,12 @@ public class RentalMapper {
      * Domain -> Entity
      */
     public RentalEntity toEntity(Rental domain, BookEntity book, UserEntity rentalUser){
+        if(domain == null || book == null || rentalUser == null) return null;
         return RentalEntity.from(domain.getId().toString(), book, rentalUser, domain.getRentalDate(), domain.getExpectedReturnDate(), domain.getReturnDate(), domain.getStatus());
+    }
+
+    public void updateEntityFromDomain(RentalEntity rentalEntity, Rental domain){
+        if(rentalEntity == null || domain == null) return;
+        rentalEntity.update(domain.getExpectedReturnDate(), domain.getReturnDate(), domain.getStatus());
     }
 }

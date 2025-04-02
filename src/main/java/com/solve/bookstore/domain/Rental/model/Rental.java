@@ -40,15 +40,15 @@ public class Rental {
         this.status = status;
     }
 
-    private void validate(BookId bookId, UserId rentalUserId, LocalDateTime rentalDate, LocalDateTime expectedReturnDat){
+    private void validate(BookId bookId, UserId rentalUserId, LocalDateTime rentalDate, LocalDateTime expectedReturnDate){
         if(bookId == null) throw new IllegalArgumentException("도서 ID는 필수값입니다.");
         if(rentalUserId == null) throw new IllegalArgumentException("대여자 ID는 필수값입니다.");
         if(rentalDate == null) throw new IllegalArgumentException("대여일자는 필수값입니다.");
-        if(expectedReturnDat == null) throw new IllegalArgumentException("반납 예정 일자는 필수값입니다.");
-        if(expectedReturnDat.isBefore(LocalDateTime.now())){
+        if(expectedReturnDate == null) throw new IllegalArgumentException("반납 예정 일자는 필수값입니다.");
+        if(expectedReturnDate.isBefore(LocalDateTime.now())){
             throw new IllegalArgumentException("반납 예정 일자는 현재 이후로 설정해주세요.");
         }
-        if(expectedReturnDat.isBefore(rentalDate)){
+        if(expectedReturnDate.isBefore(rentalDate)){
             throw new IllegalArgumentException("반납 예정 일자는 대여일자 이후로 설정해주세요.");
         }
     }
@@ -67,9 +67,11 @@ public class Rental {
     }
 
     public void returnCompleted(){
-        if(this.status == RentalStatus.RETURNED){
+        if(this.status == RentalStatus.RETURNED)
             throw new IllegalArgumentException("이미 반납된 도서 입니다.");
-        }
+        if(LocalDateTime.now().isBefore(this.rentalDate))
+            throw new IllegalArgumentException("반납 일자는 대여일 이후로 설정해주세요.");
+
         this.returnDate = LocalDateTime.now();
         this.status = RentalStatus.RETURNED;
     }

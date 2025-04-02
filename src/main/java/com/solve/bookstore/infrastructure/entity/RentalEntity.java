@@ -5,6 +5,7 @@ import com.solve.bookstore.infrastructure.config.BaseEntity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.DynamicUpdate;
 
 import java.time.LocalDateTime;
 
@@ -47,5 +48,11 @@ public class RentalEntity extends BaseEntity {
 
     public static RentalEntity from(String id, BookEntity book, UserEntity rentalUser, LocalDateTime rentalDate, LocalDateTime expectedReturnDate, LocalDateTime returnDate, RentalStatus status){
         return new RentalEntity(id, book, rentalUser, rentalDate, expectedReturnDate, returnDate, status);
+    }
+
+    public void update(LocalDateTime expectedReturnDate, LocalDateTime returnDate, RentalStatus status){
+        this.expectedReturnDate = expectedReturnDate;
+        this.returnDate = returnDate;
+        this.status = status;
     }
 }

@@ -100,33 +100,35 @@ public class BookService {
      */
     @Transactional
     public BookStatusChangeResponse updateAndSaveBookStatus(String bookId, BookStatusChangeRequest request) {
-        Book book = bookRepository.findById(new BookId(bookId));
+        Book book = getBook(bookId);
 
-        BookStatus bookStatus = BookStatus.fromStr(request.bookStatus());
-        book.updateStatus(bookStatus);
+        updateBookStatus(request.bookStatus(), book);
         Book savedBook =  bookRepository.save(book);
 
         return BookStatusChangeResponse.success(savedBook.getId().toString(), savedBook.getStatus().name());
     }
 
+    private void updateBookStatus(String updateStatus, Book book) {
+        BookStatus bookStatus = BookStatus.fromStr(updateStatus);
+        book.updateStatus(bookStatus);
+    }
 
-     //request에 category 유무 확인
-    private static boolean hasNoCategories(List<String> categoryIds) {
+    //request에 category 유무 확인
+    private boolean hasNoCategories(List<String> categoryIds) {
         return categoryIds == null || categoryIds.isEmpty();
     }
 
 
      //String CategoryId -> new CategoryId()
-    private static Set<CategoryId> getCategoryIds(CategoryUpdateRequest request) {
+    private Set<CategoryId> getCategoryIds(CategoryUpdateRequest request) {
         return request.categoryIds().stream()
                 .map(CategoryId::new)
                 .collect(Collectors.toSet());
     }
 
-    private Book getBook(String bookId) {
+    public Book getBook(String bookId) {
         return bookRepository.findById(new BookId(bookId));
     }
-
 
      // 존재하지 않는 카테고리 ID validation -> id 없는 경우 오류
     private void validateCategory(Set<CategoryId> newCategoryIds) {
