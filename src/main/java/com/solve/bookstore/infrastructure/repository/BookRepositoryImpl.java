@@ -11,6 +11,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Repository
 @Slf4j
@@ -46,5 +48,44 @@ public class BookRepositoryImpl implements BookRepository {
     @Override
     public void deleteAll() {
         bookJpaRepository.deleteAll();
+    }
+    
+    @Override
+    public List<Book> findByIds(Set<BookId> bookIds) {
+        if (bookIds == null || bookIds.isEmpty()) {
+            return List.of();
+        }
+        
+        Set<String> stringIds = bookIds.stream()
+                .map(BookId::toString)
+                .collect(Collectors.toSet());
+        
+        return bookJpaRepository.findByIdIn(stringIds).stream()
+                .map(bookMapper::toDomain)
+                .toList();
+    }
+    
+    @Override
+    public List<Book> findByTitleContaining(String title) {
+        List<BookEntity> entities = bookJpaRepository.findByTitleContaining(title);
+        return entities.stream()
+                .map(bookMapper::toDomain)
+                .toList();
+    }
+    
+    @Override
+    public List<Book> findByAuthorContaining(String author) {
+        List<BookEntity> entities = bookJpaRepository.findByAuthorContaining(author);
+        return entities.stream()
+                .map(bookMapper::toDomain)
+                .toList();
+    }
+    
+    @Override
+    public List<Book> findByTitleContainingAndAuthorContaining(String title, String author) {
+        List<BookEntity> entities = bookJpaRepository.findByTitleContainingAndAuthorContaining(title, author);
+        return entities.stream()
+                .map(bookMapper::toDomain)
+                .toList();
     }
 }

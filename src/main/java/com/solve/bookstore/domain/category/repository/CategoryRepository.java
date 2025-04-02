@@ -14,4 +14,5 @@ public interface CategoryRepository {
     List<Category> findAllByIds(Set<CategoryId> ids);
     Set<CategoryId> findAllIdsByIds(Set<CategoryId> ids);
     void deleteAll();
+    boolean existsById(CategoryId id);
 }

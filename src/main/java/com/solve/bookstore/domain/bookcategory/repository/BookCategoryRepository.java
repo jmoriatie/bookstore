@@ -12,12 +12,9 @@ public interface BookCategoryRepository {
     BookCategory save(BookCategory bookCategory);
 
     List<BookCategory> findByBookId(BookId bookId);
-    List<BookCategory> findByBookIds(Set<BookId> bookIds);
     Set<CategoryId> findCategoryIdByBookIdIn(BookId bookId);
-
-    int deleteByBookIdIn(Set<BookId> bookIds);
-
+    List<BookCategory> findByCategoryId(CategoryId categoryId);
     List<BookCategory> saveAll(List<BookCategory> bookCategories);
-
     void deleteAll();
+    int deleteByBookIdIn(Set<BookId> bookIds);
 }

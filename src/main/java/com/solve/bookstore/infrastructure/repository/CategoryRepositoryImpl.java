@@ -77,4 +77,9 @@ public class CategoryRepositoryImpl implements CategoryRepository {
     public void deleteAll() {
         categoryJpaRepository.deleteAll();
     }
+    
+    @Override
+    public boolean existsById(CategoryId id) {
+        return categoryJpaRepository.existsById(id.toString());
+    }
 }

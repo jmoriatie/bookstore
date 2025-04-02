@@ -28,11 +28,6 @@ public class BookCategoryRepositoryImpl implements BookCategoryRepository {
     private final BookCategoryMapper bookCategoryMapper;
 
     @Override
-    public List<BookCategory> findByBookIds(Set<BookId> bookIds) {
-        return null;
-    }
-
-    @Override
     public Set<CategoryId> findCategoryIdByBookIdIn(BookId bookId) {
         Set<String> categoryIdsStr = bookCategoryJpaRepository.findCategory_IdByBook_IdIn(bookId.toString());
         return categoryIdsStr.stream()
@@ -82,5 +77,13 @@ public class BookCategoryRepositoryImpl implements BookCategoryRepository {
     @Override
     public void deleteAll() {
         bookCategoryJpaRepository.deleteAll();
+    }
+    
+    @Override
+    public List<BookCategory> findByCategoryId(CategoryId categoryId) {
+        List<BookCategoryEntity> entities = bookCategoryJpaRepository.findByCategory_Id(categoryId.toString());
+        return entities.stream()
+                .map(bookCategoryMapper::toDomain)
+                .toList();
     }
 }

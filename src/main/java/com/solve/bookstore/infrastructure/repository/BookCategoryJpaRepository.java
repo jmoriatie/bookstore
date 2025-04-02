@@ -21,4 +21,5 @@ public interface BookCategoryJpaRepository extends JpaRepository<BookCategoryEnt
     Set<String> findCategory_IdByBook_IdIn(String bookId);
 
     List<BookCategoryEntity> findByBook_Id(String bookId);
+    List<BookCategoryEntity> findByCategory_Id(String categoryId);
 }
