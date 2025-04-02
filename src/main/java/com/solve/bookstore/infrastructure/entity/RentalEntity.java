@@ -5,7 +5,6 @@ import com.solve.bookstore.infrastructure.config.BaseEntity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.DynamicUpdate;
 
 import java.time.LocalDateTime;
 

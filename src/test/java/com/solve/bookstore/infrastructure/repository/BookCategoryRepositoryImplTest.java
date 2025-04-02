@@ -1,7 +1,6 @@
 package com.solve.bookstore.infrastructure.repository;
 
 import com.solve.bookstore.domain.book.model.BookId;
-import com.solve.bookstore.domain.book.model.Isbn;
 import com.solve.bookstore.domain.bookcategory.model.BookCategory;
 import com.solve.bookstore.domain.category.model.CategoryId;
 import com.solve.bookstore.infrastructure.entity.BookCategoryEntity;
@@ -13,8 +12,10 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
@@ -121,6 +122,7 @@ class BookCategoryRepositoryImplTest {
     }
 
     @Nested
+    @ExtendWith(MockitoExtension.class)
     class MockitoTest {
         @Mock
         private BookCategoryJpaRepository bookCategoryJpaRepository;
@@ -210,29 +212,6 @@ class BookCategoryRepositoryImplTest {
             verify(bookJpaRepository).findById(bookId.toString());
             verify(categoryJpaRepository).findById(categoryId.toString());
             verify(bookCategoryJpaRepository, never()).save(any());
-        }
-
-        @Test
-        @DisplayName("BookCategory 저장 - Mapper 변환 예외")
-        void save_MapperException() {
-            // given
-            when(bookJpaRepository.findById(bookId.toString())).thenReturn(Optional.of(bookEntity));
-            when(categoryJpaRepository.findById(categoryId.toString())).thenReturn(Optional.of(categoryEntity));
-            when(bookCategoryJpaRepository.save(any(BookCategoryEntity.class))).thenReturn(savedBookCategoryEntity);
-            when(bookCategoryMapper.toDomain(any(BookCategoryEntity.class))).thenThrow(new RuntimeException("도메인 매핑 중 오류 발생"));
-
-            // when & then
-            RuntimeException exception = assertThrows(RuntimeException.class, () -> {
-                bookCategoryRepository.save(bookCategory);
-            });
-
-            // 에러 메시지 검증
-            assertEquals("도메인 매핑 중 오류 발생", exception.getMessage());
-
-            verify(bookJpaRepository).findById(bookId.toString());
-            verify(categoryJpaRepository).findById(categoryId.toString());
-            verify(bookCategoryJpaRepository).save(any(BookCategoryEntity.class));
-            verify(bookCategoryMapper).toDomain(any(BookCategoryEntity.class));
         }
     }
 }

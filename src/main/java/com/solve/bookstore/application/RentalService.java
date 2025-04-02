@@ -33,23 +33,14 @@ public class RentalService {
         this.bookService = bookService;
     }
 
-
     // TODO 구현 -> 메서드 분리 -> Class 분리 단계별 리팩토링 필요
-
-    // TODO 훼손, 분실 대여 중단
-    //  - 대여 불가로 변경 여부 확인 isAvailableForRental
 
     // TODO 연체 관련 메서드?
 
     // --- 필요 ---
-    // TODO CRUD 더?
     // TODO Exception 커스텀
-
     // NOTE 카운터에서 대여 관리자가 바코드를 찍고 입력하는 등의 시나리오
-    // TODO 서치한 책과 동일한 대여가능 책 확인 - ISBN
-    //  count & 실제 대여 가능 책 있는지 여부 확인
 
-    // TODO TEST
     /**
      * 도서 대여
      */
@@ -58,7 +49,6 @@ public class RentalService {
         validateRent(book);
 
         User rentalUser = userRepository.findById(new UserId(rentalUserId));
-
         Rental rental = Rental.create(
                 book.getId(),
                 rentalUser.getId(),
@@ -69,7 +59,6 @@ public class RentalService {
         return RentSuccessResponse.success(savedRental.getId().toString(), bookId, book.getTitle());
     }
 
-    // TODO TEST
     /**
      * 도서 반납
      * 요구사항: 훼손, 분실로 도서 상태 변경
