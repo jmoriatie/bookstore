@@ -1,7 +1,7 @@
 package com.solve.bookstore.infrastructure.repository;
 
-import com.solve.bookstore.domain.Rental.model.Rental;
-import com.solve.bookstore.domain.Rental.repository.RentalRepository;
+import com.solve.bookstore.domain.rental.model.Rental;
+import com.solve.bookstore.domain.rental.repository.RentalRepository;
 import com.solve.bookstore.domain.book.model.BookId;
 import com.solve.bookstore.infrastructure.entity.BookEntity;
 import com.solve.bookstore.infrastructure.entity.RentalEntity;

@@ -1,8 +1,8 @@
 package com.solve.bookstore.infrastructure.repository.mapper;
 
-import com.solve.bookstore.domain.User.model.User;
-import com.solve.bookstore.domain.User.model.UserId;
-import com.solve.bookstore.domain.User.model.UserRole;
+import com.solve.bookstore.domain.user.model.User;
+import com.solve.bookstore.domain.user.model.UserId;
+import com.solve.bookstore.domain.user.model.UserRole;
 import com.solve.bookstore.infrastructure.entity.UserEntity;
 import org.springframework.stereotype.Component;
 

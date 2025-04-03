@@ -1,14 +1,12 @@
 package com.solve.bookstore.infrastructure.repository;
 
-import com.solve.bookstore.domain.User.model.User;
-import com.solve.bookstore.domain.User.model.UserId;
-import com.solve.bookstore.domain.User.repository.UserRepository;
+import com.solve.bookstore.domain.user.model.User;
+import com.solve.bookstore.domain.user.model.UserId;
+import com.solve.bookstore.domain.user.repository.UserRepository;
 import com.solve.bookstore.infrastructure.entity.UserEntity;
 import com.solve.bookstore.infrastructure.repository.mapper.UserMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
-
-import java.util.Optional;
 
 @Repository
 @RequiredArgsConstructor

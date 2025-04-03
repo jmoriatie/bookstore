@@ -1,7 +1,7 @@
 package com.solve.bookstore.application.security;
 
-import com.solve.bookstore.domain.User.model.User;
-import com.solve.bookstore.domain.User.repository.UserRepository;
+import com.solve.bookstore.domain.user.model.User;
+import com.solve.bookstore.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;

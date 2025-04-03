@@ -1,6 +1,6 @@
 package com.solve.bookstore.application.security;
 
-import com.solve.bookstore.domain.User.model.User;
+import com.solve.bookstore.domain.user.model.User;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;

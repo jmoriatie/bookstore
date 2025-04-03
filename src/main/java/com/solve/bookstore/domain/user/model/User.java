@@ -1,4 +1,4 @@
-package com.solve.bookstore.domain.User.model;
+package com.solve.bookstore.domain.user.model;
 
 import lombok.Getter;
 

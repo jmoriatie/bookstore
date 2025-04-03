@@ -1,6 +1,6 @@
-package com.solve.bookstore.domain.Rental.model;
+package com.solve.bookstore.domain.rental.model;
 
-import com.solve.bookstore.domain.User.model.UserId;
+import com.solve.bookstore.domain.user.model.UserId;
 import com.solve.bookstore.domain.book.model.BookId;
 import lombok.Getter;
 

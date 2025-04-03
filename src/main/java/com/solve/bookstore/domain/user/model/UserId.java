@@ -1,19 +1,18 @@
-package com.solve.bookstore.domain.Rental.model;
+package com.solve.bookstore.domain.user.model;
 
 import lombok.EqualsAndHashCode;
-import lombok.Getter;
 
 import java.util.UUID;
 
 @EqualsAndHashCode
-public class RentalId {
+public class UserId {
     private final String id;
 
-    public RentalId() {
+    public UserId() {
         this.id = UUID.randomUUID().toString();
     }
 
-    public RentalId(String id) {
+    public UserId(String id) {
         this.id = id;
     }
 

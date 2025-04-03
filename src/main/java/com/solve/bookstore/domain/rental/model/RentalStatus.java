@@ -1,4 +1,4 @@
-package com.solve.bookstore.domain.Rental.model;
+package com.solve.bookstore.domain.rental.model;
 
 import lombok.Getter;
 

@@ -1,8 +1,8 @@
 package com.solve.bookstore.infrastructure.repository.mapper;
 
-import com.solve.bookstore.domain.Rental.model.Rental;
-import com.solve.bookstore.domain.Rental.model.RentalId;
-import com.solve.bookstore.domain.User.model.UserId;
+import com.solve.bookstore.domain.rental.model.Rental;
+import com.solve.bookstore.domain.rental.model.RentalId;
+import com.solve.bookstore.domain.user.model.UserId;
 import com.solve.bookstore.domain.book.model.BookId;
 import com.solve.bookstore.infrastructure.entity.BookEntity;
 import com.solve.bookstore.infrastructure.entity.RentalEntity;

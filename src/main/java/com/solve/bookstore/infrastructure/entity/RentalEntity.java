@@ -1,6 +1,6 @@
 package com.solve.bookstore.infrastructure.entity;
 
-import com.solve.bookstore.domain.Rental.model.RentalStatus;
+import com.solve.bookstore.domain.rental.model.RentalStatus;
 import com.solve.bookstore.infrastructure.config.BaseEntity;
 import jakarta.persistence.*;
 import lombok.Getter;
