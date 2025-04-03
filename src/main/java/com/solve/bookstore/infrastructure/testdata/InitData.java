@@ -1,6 +1,7 @@
 package com.solve.bookstore.infrastructure.testdata;
 
 import com.solve.bookstore.domain.book.model.Book;
+import com.solve.bookstore.domain.book.model.BookId;
 import com.solve.bookstore.domain.book.model.BookStatus;
 import com.solve.bookstore.domain.book.model.Isbn;
 import com.solve.bookstore.domain.book.repository.BookRepository;
@@ -12,6 +13,7 @@ import com.solve.bookstore.domain.category.repository.CategoryRepository;
 import com.solve.bookstore.domain.rental.model.Rental;
 import com.solve.bookstore.domain.rental.repository.RentalRepository;
 import com.solve.bookstore.domain.user.model.User;
+import com.solve.bookstore.domain.user.model.UserId;
 import com.solve.bookstore.domain.user.model.UserRole;
 import com.solve.bookstore.domain.user.repository.UserRepository;
 import lombok.AllArgsConstructor;
@@ -61,6 +63,15 @@ public class InitData implements CommandLineRunner {
                 "문학", "경제경영", "인문학", "IT", "과학"
         );
 
+        List<Category> testCategories = List.of(
+                new Category(new CategoryId("cid-1"), "취미/실용/스포츠"),
+                new Category(new CategoryId("cid-2"), "육아")
+        );
+        for(Category c : testCategories){ // 테스트 가능 카테고리
+            categoryRepository.save(c);
+            categoryMap.put(c.getName(), c.getId());
+        }
+
         for (String name : categoryNames) {
             Category category = new Category(null, name);
             categoryRepository.save(category);
@@ -82,12 +93,35 @@ public class InitData implements CommandLineRunner {
                 new BookData("인문학", "실패에 대하여 생각하지 마라", "위성원"),
                 new BookData("IT", "실리콘밸리 리더십 쉽다", "지승열"),
                 new BookData("IT", "데이터분석을 위한 A 프로그래밍", "지승열"),
-                new BookData("IT", "인공지능1-12", "장동혁"),
                 new BookData("IT", "-1년차 게임 개발", "위성원"),
+                new BookData("IT", "인공지능1-12", "장동혁"),
                 new BookData("IT", "Skye가 알려주는 피부 채색의 비결", "권태영"),
                 new BookData("과학", "자연의 발전", "장지명"),
                 new BookData("과학", "코스모스 필 무렵", "이승열")
         );
+
+        BookData bookData = new BookData("취미/실용/스포츠", "하루만에 5키로 빼기", "다이어트퀸");
+        Book testingBook1 = Book.rebuild(
+                new BookId("tbid-111"),
+                bookData.title,
+                bookData.author,
+                generateDescription(bookData.title),
+                BookStatus.AVAILABLE,
+                new Isbn("ISBN-99999"));
+        bookRepository.save(testingBook1);  // Rent 테스트 가능 도서
+        bookCategoryRepository.save(BookCategory.create(testingBook1.getId(), new CategoryId("cid-1")));
+        bookCategoryRepository.save(BookCategory.create(testingBook1.getId(), new CategoryId("cid-2")));
+
+        BookData bookData2 = new BookData("육아", "육아왕으로 가는 길", "육아왕");
+        Book testingBook2 = Book.rebuild(
+                new BookId("tbid-222"),
+                bookData2.title,
+                bookData2.author,
+                generateDescription(bookData2.title),
+                BookStatus.AVAILABLE,
+                new Isbn("ISBN-99999"));
+        bookRepository.save(testingBook2);  // Book 상태변경 테스트 가능 도서
+        createBookCategory(categories, bookData2, testingBook2);
 
         for (BookData data : bookDataList) { // 도서 생성
             Book book = Book.create(
@@ -96,8 +130,7 @@ public class InitData implements CommandLineRunner {
                     generateDescription(data.title),  // 임의의 설명 생성
                     new Isbn(generateRandomIsbn())    // 임의의 ISBN 생성
             );
-            Book savedBook = bookRepository.save(book);
-            books.add(savedBook);
+            books.add(bookRepository.save(book));
 
             createBookCategory(categories, data, book); // Book-Category 연관관계 생성
         }
@@ -116,17 +149,15 @@ public class InitData implements CommandLineRunner {
         );
         users.add(userRepository.save(adminUser));
 
-        List<String> userNames = List.of("나빌림", "이문학", "김경영");
-        for (String name : userNames) {
-            User user = User.create(
-                    name,
-                    String.format("010-%04d-%04d", new Random().nextInt(10), new Random().nextInt(10)),
-                    name + "@example.com",
-                    passwordEncoder.encode("123"),
-                    UserRole.USER
-            );
-            users.add(userRepository.save(user));
-        }
+        User testUser = User.of(
+                new UserId("tuid-999"),
+                "나빌림",
+                "010-0000-0000",
+                "user@user.com",
+                passwordEncoder.encode("user"),
+                UserRole.USER
+        );
+        users.add(userRepository.save(testUser));
         return users;
     }
 
@@ -136,16 +167,16 @@ public class InitData implements CommandLineRunner {
                 // 현재 대여 중인 도서들 (반납일 X)
                 new RentalData(0, 1, now.minusDays(5), null),
                 new RentalData(1, 1, now.minusDays(3), null),
-                new RentalData(2, 2, now.minusDays(2), null),
-                new RentalData(3, 2, now.minusDays(1), null),
+                new RentalData(2, 1, now.minusDays(2), null),
+                new RentalData(3, 1, now.minusDays(1), null),
 
                 // 반납완료 도서
                 new RentalData(4, 1, now.minusDays(5), now.minusDays(3)),
-                new RentalData(5, 2, now.minusDays(8), now.minusDays(2)),
-                new RentalData(6, 3, now.minusDays(9), now.minusDays(5)),
-                new RentalData(7, 3, now.minusDays(8), now.minusDays(3)),
+                new RentalData(5, 1, now.minusDays(8), now.minusDays(2)),
+                new RentalData(6, 1, now.minusDays(9), now.minusDays(5)),
+                new RentalData(7, 1, now.minusDays(8), now.minusDays(3)),
                 new RentalData(8, 1, now.minusDays(7), now.minusDays(2)),
-                new RentalData(9, 2, now.minusDays(5), now.minusDays(1))
+                new RentalData(9, 1, now.minusDays(5), now.minusDays(1))
         );
 
         for (RentalData data : rentalDataList) {

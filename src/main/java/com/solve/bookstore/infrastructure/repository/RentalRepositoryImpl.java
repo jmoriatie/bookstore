@@ -28,7 +28,8 @@ public class RentalRepositoryImpl implements RentalRepository {
         UserEntity rentalUserEntity = userJpaRepository.findById(rental.getRentalUserId().toString())
                 .orElseThrow(() -> new IllegalArgumentException("없는 UserId 입니다. id=" + rental.getRentalUserId().toString()));
         RentalEntity entity = rentalJpaRepository.save(rentalMapper.toEntity(rental, bookEntity, rentalUserEntity));
-        log.info("saved Rental id={}, bookTitle={}, rentalDate={}, expectedReturnDate={}, status={}", entity.getId(), bookEntity.getTitle(), entity.getRentalDate(), entity.getExpectedReturnDate(), entity.getStatus());
+        log.info("saved Rental id={}, bookTitle={}, userId={}, userEmail={}, rentalDate={}, expectedReturnDate={}, status={}"
+                , entity.getId(), bookEntity.getTitle(), rentalUserEntity.getId(), rentalUserEntity.getEmail(), entity.getRentalDate(), entity.getExpectedReturnDate(), entity.getStatus());
         return rentalMapper.toDomain(entity);
     }
 

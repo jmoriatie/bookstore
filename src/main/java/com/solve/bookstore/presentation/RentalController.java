@@ -6,6 +6,7 @@ import com.solve.bookstore.application.dto.RentSuccessResponse;
 import com.solve.bookstore.application.dto.ReturnBookResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -20,26 +21,49 @@ public class RentalController {
 
     private final RentalService rentalService;
 
-    @Operation(summary = "도서 대여",
-            description = "도서를 대여합니다. 대여 가능한 상태의 도서만 대여할 수 있습니다.")
+    @Operation(summary = "도서 대여: USER, ADMIN",
+            description = """
+                    도서를 대여합니다. 대여 가능한 상태의 도서만 대여할 수 있습니다.
+                                        
+                    [Auth - 테스트 계정 정보]
+                    - ID: user@user.com
+                    - PW: user
+                    """)
     @PostMapping("{bookId}/{rentalUserId}")
     public ResponseEntity<RentSuccessResponse> rent(
-            @Parameter(description = "도서 ID", required = true)
+            @Parameter(description = "도서 ID", required = true, example = "tbid-111")
             @PathVariable String bookId,
-            @Parameter(description = "대여자 ID", required = true)
+            @Parameter(description = "대여자 ID", required = true, example = "tuid-999")
             @PathVariable String rentalUserId
-    ){
+    ) {
         RentSuccessResponse response = rentalService.rent(bookId, rentalUserId);
         return ResponseEntity.ok(response);
     }
 
-    @Operation(summary = "도서 반납", description = "도서를 반납합니다. 반납 시 도서 상태를 변경할 수 있습니다.")
+    @Operation(summary = "도서 반납: USER, ADMIN",
+            description = """
+                    도서를 반납합니다. 반납 시 도서 상태를 변경할 수 있습니다.
+                                        
+                    [Auth - 테스트 계정 정보]
+                    - ID: user@user.com
+                    - PW: user
+                                        
+                    <<대여 API 우선 호출 필요>>
+                    """)
     @PatchMapping("{bookId}/{rentalUserId}")
     public ResponseEntity<ReturnBookResponse> returnBook(
-            @Parameter(description = "도서 ID", required = true)
+            @Parameter(description = "도서 ID", required = true, example = "tbid-111")
             @PathVariable String bookId,
+            @Parameter(description = "도서 상태", required = true,
+                    schema = @Schema(
+                            example = """
+                                    {
+                                      "book_status": "AVAILABLE"
+                                    }
+                                    """
+                    ))
             @RequestBody @Valid BookStatusChangeRequest request
-    ){
+    ) {
         ReturnBookResponse response = rentalService.returnBook(bookId, request);
         return ResponseEntity.ok(response);
     }

@@ -13,35 +13,24 @@ spring:
         format_sql: true
     open-in-view: false
 
-    # h2 db datasource
-    h2:
-      console:
-        enabled: true
-        path: /h2-console
+  # h2 db datasource
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
 
-    datasource:
-      driver-class-name: org.h2.Driver
-      url: jdbc:h2:mem:testdb;MODE=MariaDB
-      username: sa
-      password:
-  # Redis
-  cache:
-    type: redis
-    redis:
-      time-to-live: 600000 # 10분
+  datasource:
+    driver-class-name: org.h2.Driver
+    url: jdbc:h2:mem:testdb;MODE=MariaDB
+    username: sa
+    password:
+
   data:
     redis:
       host: localhost
+      timeout: 10000ms
       port: 6379
-      timeout: 5000ms
 
-springdoc:
-  swagger-ui:
-    path: /swagger-ui.html
-  api-docs:
-    path: /v3/api-docs
-  show-actuator: true
-  packages-to-scan: com.solve.bookstore.presentation
-  paths-to-match: /api/v1/**
-  default-consumes-media-type: application/json
-  default-produces-media-type: application/json
+logging:
+  level:
+    org.springframework.security: INFO

@@ -82,24 +82,26 @@ public class BookService {
     @Transactional
     public CategoryChangedResponse changeCategories(String bookId, CategoryUpdateRequest request) {
         if (hasNoCategories(request.categoryIds()))
-            return new CategoryChangedResponse(Collections.emptySet());
+            return new CategoryChangedResponse(Collections.emptySet(), Collections.emptySet(), "변경할 카테고리가 비어있습니다.");
 
-        BookSearchResponse response = bookSearchService.getSameIsbnBooks(getBook(bookId));
+        Book book = getBook(bookId);
+        BookSearchResponse response = bookSearchService.getSameIsbnBooks(book.getIsbn().toString());
         Set<BookId> sameIsbnBookIds = response.books().stream()
                 .map(BookSearchResponse.BookInfo::bookId)
                 .map(BookId::new)
                 .collect(Collectors.toSet());
-//        List<Book> sameIsbnBook = bookSearchService.getSameIsbnBooks(getBook(bookId));
-//        Set<BookId> sameIsbnBookIds = sameIsbnBook.stream()
-//                .map(Book::getId)
-//                .collect(Collectors.toSet());
+
         Set<CategoryId> newCategoryIds = getCategoryIds(request);
         validateCategory(newCategoryIds);
 
         bookCategoryRepository.deleteByBookIdIn(sameIsbnBookIds); // 연관관계 삭제
         saveBookCategoriesForAllBook(sameIsbnBookIds, newCategoryIds);
 
-        return new CategoryChangedResponse(sameIsbnBookIds);
+        return new CategoryChangedResponse(
+                sameIsbnBookIds.stream().map(BookId::toString).collect(Collectors.toSet()),
+                newCategoryIds.stream().map(CategoryId::toString).collect(Collectors.toSet()),
+                "카테고리가 변경되었습니다."
+        );
     }
 
     /**
