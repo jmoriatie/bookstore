@@ -84,7 +84,15 @@ public class BookService {
         if (hasNoCategories(request.categoryIds()))
             return new CategoryChangedResponse(Collections.emptySet());
 
-        Set<BookId> sameIsbnBookIds = bookSearchService.getSameIsbnBooks(getBook(bookId));
+        BookSearchResponse response = bookSearchService.getSameIsbnBooks(getBook(bookId));
+        Set<BookId> sameIsbnBookIds = response.books().stream()
+                .map(BookSearchResponse.BookInfo::bookId)
+                .map(BookId::new)
+                .collect(Collectors.toSet());
+//        List<Book> sameIsbnBook = bookSearchService.getSameIsbnBooks(getBook(bookId));
+//        Set<BookId> sameIsbnBookIds = sameIsbnBook.stream()
+//                .map(Book::getId)
+//                .collect(Collectors.toSet());
         Set<CategoryId> newCategoryIds = getCategoryIds(request);
         validateCategory(newCategoryIds);
 

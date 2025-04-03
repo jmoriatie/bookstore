@@ -10,7 +10,6 @@ import java.util.Set;
 public interface BookCategoryRepository {
 
     BookCategory save(BookCategory bookCategory);
-
     List<BookCategory> findByBookId(BookId bookId);
     Set<CategoryId> findCategoryIdByBookIdIn(BookId bookId);
     List<BookCategory> findByCategoryId(CategoryId categoryId);

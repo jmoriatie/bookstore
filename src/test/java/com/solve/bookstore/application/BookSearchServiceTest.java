@@ -1,5 +1,6 @@
 package com.solve.bookstore.application;
 
+import com.solve.bookstore.application.dto.BookSearchResponse;
 import com.solve.bookstore.domain.book.model.Book;
 import com.solve.bookstore.domain.book.model.BookId;
 import com.solve.bookstore.domain.book.model.Isbn;
@@ -17,9 +18,9 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -70,7 +71,11 @@ class BookSearchServiceTest {
         when(bookRepository.findByIsbn(any(Isbn.class))).thenReturn(List.of(book1, book2));
 
         // when
-        Set<BookId> result = bookSearchService.getSameIsbnBooks(book1);
+        BookSearchResponse response = bookSearchService.getSameIsbnBooks(book1);
+        Set<BookId> result = response.books().stream().
+                map(BookSearchResponse.BookInfo::bookId)
+                .map(BookId::new)
+                .collect(Collectors.toSet());
 
         // then
         assertThat(result).hasSize(2);
@@ -86,11 +91,13 @@ class BookSearchServiceTest {
         when(bookRepository.findByIds(any())).thenReturn(List.of(book1, book2));
 
         // when
-        List<Book> result = bookSearchService.findBooksByCategory(categoryId);
+        BookSearchResponse response = bookSearchService.findBooksByCategory(categoryId);
 
+        BookSearchResponse.BookInfo resultBook1 = BookSearchResponse.BookInfo.from(book1);
+        BookSearchResponse.BookInfo resultBook2 = BookSearchResponse.BookInfo.from(book2);
         // then
-        assertThat(result).hasSize(2);
-        assertThat(result).containsExactly(book1, book2);
+        assertThat(response.books()).hasSize(2);
+        assertThat(response.books()).containsExactly(resultBook1, resultBook2);
         verify(categoryRepository, times(1)).existsById(categoryId);
         verify(bookCategoryRepository, times(1)).findByCategoryId(categoryId);
         verify(bookRepository, times(1)).findByIds(any());
@@ -103,8 +110,8 @@ class BookSearchServiceTest {
         when(categoryRepository.existsById(categoryId)).thenReturn(false);
 
         // when
-        List<Book> result = bookSearchService.findBooksByCategory(categoryId);
-
+        BookSearchResponse response = bookSearchService.findBooksByCategory(categoryId);
+        List<BookSearchResponse.BookInfo> result = response.books();
         // then
         assertThat(result).isEmpty();
     }
@@ -117,11 +124,12 @@ class BookSearchServiceTest {
         when(bookRepository.findByTitleContaining(title)).thenReturn(List.of(book1));
 
         // when
-        List<Book> result = bookSearchService.findBooksByTitle(title);
+        BookSearchResponse response = bookSearchService.findBooksByTitle(title);
+        List<BookSearchResponse.BookInfo> result = response.books();
 
         // then
         assertThat(result).hasSize(1);
-        assertThat(result.get(0).getTitle()).isEqualTo("이것이 개발이다");
+        assertThat(result.get(0).title()).isEqualTo("이것이 개발이다");
     }
 
     @Test
@@ -132,11 +140,12 @@ class BookSearchServiceTest {
         when(bookRepository.findByAuthorContaining(author)).thenReturn(List.of(book2));
 
         // when
-        List<Book> result = bookSearchService.findBooksByAuthor(author);
+        BookSearchResponse response = bookSearchService.findBooksByAuthor(author);
+        List<BookSearchResponse.BookInfo> result = response.books();
 
         // then
         assertThat(result).hasSize(1);
-        assertThat(result.get(0).getAuthor()).isEqualTo("이자바");
+        assertThat(result.get(0).author()).isEqualTo("이자바");
     }
 
     @Test
@@ -148,12 +157,13 @@ class BookSearchServiceTest {
         when(bookRepository.findByTitleContainingAndAuthorContaining(title, author)).thenReturn(List.of(book2));
 
         // when
-        List<Book> result = bookSearchService.findBooksByTitleAndAuthor(title, author);
+        BookSearchResponse response = bookSearchService.findBooksByTitleAndAuthor(title, author);
+        List<BookSearchResponse.BookInfo> result = response.books();
 
         // then
         assertThat(result).hasSize(1);
-        assertThat(result.get(0).getTitle()).isEqualTo("자바를 잡아");
-        assertThat(result.get(0).getAuthor()).isEqualTo("이자바");
+        assertThat(result.get(0).title()).isEqualTo("자바를 잡아");
+        assertThat(result.get(0).author()).isEqualTo("이자바");
     }
 
     @Test
