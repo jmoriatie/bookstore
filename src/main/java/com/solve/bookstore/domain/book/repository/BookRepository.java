@@ -2,6 +2,7 @@ package com.solve.bookstore.domain.book.repository;
 
 import com.solve.bookstore.domain.book.model.Book;
 import com.solve.bookstore.domain.book.model.BookId;
+import com.solve.bookstore.domain.book.model.BookStatus;
 import com.solve.bookstore.domain.book.model.Isbn;
 
 import java.util.List;
@@ -18,4 +19,5 @@ public interface BookRepository {
     List<Book> findByTitleContaining(String title);
     List<Book> findByAuthorContaining(String author);
     List<Book> findByTitleContainingAndAuthorContaining(String title, String author);
+    List<Book> findByStatus(BookStatus status);
 }

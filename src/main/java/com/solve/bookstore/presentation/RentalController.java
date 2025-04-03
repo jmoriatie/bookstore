@@ -20,7 +20,8 @@ public class RentalController {
 
     private final RentalService rentalService;
 
-    @Operation(summary = "도서 대여", description = "도서를 대여합니다. 대여 가능한 상태의 도서만 대여할 수 있습니다.")
+    @Operation(summary = "도서 대여",
+            description = "도서를 대여합니다. 대여 가능한 상태의 도서만 대여할 수 있습니다.")
     @PostMapping("{bookId}/{rentalUserId}")
     public ResponseEntity<RentSuccessResponse> rent(
             @Parameter(description = "도서 ID", required = true)

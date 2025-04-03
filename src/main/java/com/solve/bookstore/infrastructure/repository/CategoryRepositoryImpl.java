@@ -27,6 +27,7 @@ public class CategoryRepositoryImpl implements CategoryRepository {
     @Override
     public Category save(Category category) {
         CategoryEntity entity = categoryJpaRepository.save(categoryMapper.toEntity(category));
+        log.info("category saved id={}, name={}", entity.getId(), entity.getName());
         return categoryMapper.toDomain(entity);
     }
 

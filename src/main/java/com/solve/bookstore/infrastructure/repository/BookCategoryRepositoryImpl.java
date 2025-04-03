@@ -9,6 +9,7 @@ import com.solve.bookstore.infrastructure.entity.BookEntity;
 import com.solve.bookstore.infrastructure.entity.CategoryEntity;
 import com.solve.bookstore.infrastructure.repository.mapper.BookCategoryMapper;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -19,6 +20,7 @@ import java.util.stream.Collectors;
  * Book & Category 연계 레포지토리
  */
 @Repository
+@Slf4j
 @RequiredArgsConstructor
 public class BookCategoryRepositoryImpl implements BookCategoryRepository {
 
@@ -48,6 +50,7 @@ public class BookCategoryRepositoryImpl implements BookCategoryRepository {
 
         BookCategoryEntity savedEntity = bookCategoryJpaRepository
                 .save(BookCategoryEntity.create(bookEntity, categoryEntity));
+        log.info("saved BookCategory bookId={}, categoryId={}, bookTitle={}, categoryName={}", bookIdStr, categoryIdStr, bookEntity.getTitle(), categoryEntity.getName());
         return bookCategoryMapper.toDomain(savedEntity);
     }
 

@@ -2,6 +2,7 @@ package com.solve.bookstore.infrastructure.repository;
 
 import com.solve.bookstore.domain.book.model.Book;
 import com.solve.bookstore.domain.book.model.BookId;
+import com.solve.bookstore.domain.book.model.BookStatus;
 import com.solve.bookstore.domain.book.model.Isbn;
 import com.solve.bookstore.domain.book.repository.BookRepository;
 import com.solve.bookstore.infrastructure.entity.BookEntity;
@@ -84,6 +85,14 @@ public class BookRepositoryImpl implements BookRepository {
     @Override
     public List<Book> findByTitleContainingAndAuthorContaining(String title, String author) {
         List<BookEntity> entities = bookJpaRepository.findByTitleContainingAndAuthorContaining(title, author);
+        return entities.stream()
+                .map(bookMapper::toDomain)
+                .toList();
+    }
+
+    @Override
+    public List<Book> findByStatus(BookStatus status) {
+        List<BookEntity> entities = bookJpaRepository.findByStatus(status.name());
         return entities.stream()
                 .map(bookMapper::toDomain)
                 .toList();

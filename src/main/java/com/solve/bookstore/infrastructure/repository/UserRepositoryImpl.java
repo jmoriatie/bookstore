@@ -6,9 +6,11 @@ import com.solve.bookstore.domain.user.repository.UserRepository;
 import com.solve.bookstore.infrastructure.entity.UserEntity;
 import com.solve.bookstore.infrastructure.repository.mapper.UserMapper;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
 
 @Repository
+@Slf4j
 @RequiredArgsConstructor
 public class UserRepositoryImpl implements UserRepository {
 
@@ -18,6 +20,7 @@ public class UserRepositoryImpl implements UserRepository {
     @Override
     public User save(User user) {
         UserEntity entity = userJpaRepository.save(userMapper.toEntity(user));
+        log.info("saved User id={}, name={}, tel={}, email={}, password={}, role={}", entity.getId(),entity.getName(), entity.getTel(), entity.getEmail(), entity.getPassword(), entity.getRole());
         return userMapper.toDomain(entity);
     }
 

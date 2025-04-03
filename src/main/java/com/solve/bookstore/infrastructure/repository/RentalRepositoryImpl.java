@@ -8,9 +8,11 @@ import com.solve.bookstore.infrastructure.entity.RentalEntity;
 import com.solve.bookstore.infrastructure.entity.UserEntity;
 import com.solve.bookstore.infrastructure.repository.mapper.RentalMapper;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
 
 @Repository
+@Slf4j
 @RequiredArgsConstructor
 public class RentalRepositoryImpl implements RentalRepository {
 
@@ -26,6 +28,7 @@ public class RentalRepositoryImpl implements RentalRepository {
         UserEntity rentalUserEntity = userJpaRepository.findById(rental.getRentalUserId().toString())
                 .orElseThrow(() -> new IllegalArgumentException("없는 UserId 입니다. id=" + rental.getRentalUserId().toString()));
         RentalEntity entity = rentalJpaRepository.save(rentalMapper.toEntity(rental, bookEntity, rentalUserEntity));
+        log.info("saved Rental id={}, bookTitle={}, rentalDate={}, expectedReturnDate={}, status={}", entity.getId(), bookEntity.getTitle(), entity.getRentalDate(), entity.getExpectedReturnDate(), entity.getStatus());
         return rentalMapper.toDomain(entity);
     }
 
