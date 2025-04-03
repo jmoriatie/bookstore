@@ -48,6 +48,9 @@ public class RentalService {
         Book book = bookService.getBook(bookId);
         validateRent(book);
 
+        book.rent();
+        Book savedBook = bookRepository.save(book);
+
         User rentalUser = userRepository.findById(new UserId(rentalUserId));
         Rental rental = Rental.create(
                 book.getId(),
@@ -56,7 +59,7 @@ public class RentalService {
                 LocalDateTime.now().plusDays(RESPECTED_RETURN_DATE));
 
         Rental savedRental = rentalRepository.saveNew(rental);
-        return RentSuccessResponse.success(savedRental.getId().toString(), bookId, book.getTitle());
+        return RentSuccessResponse.success(savedRental.getId().toString(), savedBook.getId().toString(), savedBook.getTitle());
     }
 
     /**
