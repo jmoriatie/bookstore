@@ -1,4 +1,4 @@
-package com.solve.bookstore.presentaion;
+package com.solve.bookstore.presentation;
 
 import com.solve.bookstore.application.BookSearchService;
 import com.solve.bookstore.application.dto.BookSearchRequest;
@@ -13,8 +13,6 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @Tag(name = "도서 검색", description = "도서 검색 관련 API")
 @RestController

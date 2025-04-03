@@ -7,6 +7,7 @@ import com.solve.bookstore.domain.Rental.model.Rental;
 import com.solve.bookstore.domain.Rental.model.RentalStatus;
 import com.solve.bookstore.domain.Rental.repository.RentalRepository;
 import com.solve.bookstore.domain.User.model.User;
+import com.solve.bookstore.domain.User.model.UserRole;
 import com.solve.bookstore.domain.User.repository.UserRepository;
 import com.solve.bookstore.domain.book.model.Book;
 import com.solve.bookstore.domain.book.model.BookStatus;
@@ -107,7 +108,7 @@ class RentalServiceTest {
 
 
     private void initData(){
-        User user = new User(null, "나빌림", "01011119999");
+        User user = User.create("나빌림", "01011119999", "jeongmin.kim@mail.com", "aaaa", UserRole.USER);
         savedUser = userRepository.save(user);
 
         Book book = Book.create(

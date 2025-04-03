@@ -24,12 +24,16 @@ spring:
       url: jdbc:h2:mem:testdb;MODE=MariaDB
       username: sa
       password:
-
+  # Redis
+  cache:
+    type: redis
+    redis:
+      time-to-live: 600000 # 10분
+  data:
     redis:
       host: localhost
       port: 6379
-      # password:
-      timeout: 10000ms
+      timeout: 5000ms
 
 springdoc:
   swagger-ui:
@@ -37,12 +41,7 @@ springdoc:
   api-docs:
     path: /v3/api-docs
   show-actuator: true
-  packages-to-scan: com.solve.bookstore.interfaces.web
+  packages-to-scan: com.solve.bookstore.presentation
   paths-to-match: /api/v1/**
   default-consumes-media-type: application/json
   default-produces-media-type: application/json
-
-cache:
-  type: redis
-  redis:
-    time-to-live: 600000  # 10분

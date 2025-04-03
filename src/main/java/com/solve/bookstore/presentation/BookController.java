@@ -1,4 +1,4 @@
-package com.solve.bookstore.presentaion;
+package com.solve.bookstore.presentation;
 
 import com.solve.bookstore.application.BookService;
 import com.solve.bookstore.application.dto.*;

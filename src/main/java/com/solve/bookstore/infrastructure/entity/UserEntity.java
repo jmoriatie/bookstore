@@ -1,35 +1,42 @@
 package com.solve.bookstore.infrastructure.entity;
 
 import com.solve.bookstore.infrastructure.config.BaseEntity;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-
-import java.util.ArrayList;
-import java.util.List;
 
 
 @Entity
 @Table(name = "users")
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
-@NoArgsConstructor
 public class UserEntity extends BaseEntity {
 
     @Id
     private String id;
 
+    @Column(nullable = false)
     private String name;
+
+    @Column(nullable = false, unique = true)
     private String tel;
 
-    @OneToMany(mappedBy = "rentalUser")
-    List<RentalEntity> rentals = new ArrayList<>();
+    @Column(nullable = false, unique = true)
+    private String email;
 
-    public UserEntity(String id, String name, String tel) {
+    @Column(nullable = false)
+    private String password;
+
+    @Column(nullable = false)
+    private String role;
+
+    public UserEntity(String id, String name, String tel, String email, String password, String role) {
         this.id = id;
         this.name = name;
         this.tel = tel;
+        this.email = email;
+        this.password = password;
+        this.role = role;
     }
 }

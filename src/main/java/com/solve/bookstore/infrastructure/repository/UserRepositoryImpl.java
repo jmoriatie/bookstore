@@ -8,6 +8,8 @@ import com.solve.bookstore.infrastructure.repository.mapper.UserMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
+
 @Repository
 @RequiredArgsConstructor
 public class UserRepositoryImpl implements UserRepository {
@@ -31,5 +33,12 @@ public class UserRepositoryImpl implements UserRepository {
     @Override
     public void deleteAll() {
         userJpaRepository.deleteAll();
+    }
+
+    @Override
+    public User findByEmail(String email) {
+        UserEntity entity = userJpaRepository.findByEmail(email)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 고객 이메일 입니다. email: " + email));
+        return userMapper.toDomain(entity);
     }
 }

@@ -7,4 +7,5 @@ public interface UserRepository {
     User save(User user);
     User findById(UserId id);
     void deleteAll();
+    User findByEmail(String email);
 }
