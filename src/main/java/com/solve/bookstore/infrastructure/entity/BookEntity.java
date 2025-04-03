@@ -35,7 +35,7 @@ public class BookEntity extends BaseEntity {
     @Column(nullable = false)
     private String isbn; // 도서 타이틀 고유식별값
 
-    @OneToMany(mappedBy = "book")
+    @OneToMany(mappedBy = "book") // Rental 이력은 별도 관리 - cacade, orphanRemoval X
     private List<RentalEntity> rentals = new ArrayList<>();
 
     private BookEntity(String id, String title, String author, String description, String status, String isbn) {

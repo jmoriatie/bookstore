@@ -72,7 +72,7 @@ class BookSearchServiceCachingTest {
     }
 
     @Test
-    @DisplayName("제목 검색 결과가 캐싱되고 두 번째 호출에서는 캐시를 사용함")
+    @DisplayName("제목 검색 결과 캐싱 - 두 번째 호출 캐시 사용")
     void findBooksByTitleWithCaching() {
         // given
         String title = "이것이";
@@ -97,7 +97,7 @@ class BookSearchServiceCachingTest {
     }
 
     @Test
-    @DisplayName("카테고리별 도서 검색 결과가 캐싱되고 두 번째 호출에서는 캐시를 사용함")
+    @DisplayName("카테고리별 도서 검색 캐싱 - 두 번째 호출에서는 캐시 사용")
     void findBooksByCategoryWithCaching() {
         // given
         when(categoryRepository.existsById(categoryId)).thenReturn(true);
@@ -122,7 +122,7 @@ class BookSearchServiceCachingTest {
     }
     
     @Test
-    @DisplayName("ISBN 기반 도서 검색이 캐싱됨")
+    @DisplayName("ISBN 기반 도서 검색 캐싱")
     void getSameIsbnBooksWithCaching() {
         // given
         when(bookRepository.findByIsbn(any())).thenReturn(List.of(book1, book2));

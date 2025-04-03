@@ -15,9 +15,7 @@ import com.solve.bookstore.domain.book.repository.BookRepository;
 import com.solve.bookstore.infrastructure.entity.RentalEntity;
 import com.solve.bookstore.infrastructure.repository.RentalJpaRepository;
 import lombok.extern.slf4j.Slf4j;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.support.TransactionTemplate;
@@ -52,12 +50,15 @@ class RentalServiceTest {
     void beforeEach(){
         bookRepository.deleteAll();
         userRepository.deleteAll();
-        rentalJpaRepository.deleteAll();
         log.debug("### success bookRepository.deleteAll()");
         log.debug("### success userRepository.deleteAll()");
-        log.debug("### success rentalJpaRepository.deleteAll()");
 
         initData();
+    }
+    @AfterEach
+    void afterEach(){
+        rentalJpaRepository.deleteAll(); // 이 후 서비스 테스트에 rental 데이터 영향 없애기 위해 변경
+        log.debug("### success rentalJpaRepository.deleteAll()");
     }
 
     @Test
