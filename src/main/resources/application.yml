@@ -30,3 +30,19 @@ spring:
       port: 6379
       # password:
       timeout: 10000ms
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+  api-docs:
+    path: /v3/api-docs
+  show-actuator: true
+  packages-to-scan: com.solve.bookstore.interfaces.web
+  paths-to-match: /api/v1/**
+  default-consumes-media-type: application/json
+  default-produces-media-type: application/json
+
+cache:
+  type: redis
+  redis:
+    time-to-live: 600000  # 10분
