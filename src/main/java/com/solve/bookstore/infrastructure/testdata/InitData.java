@@ -21,6 +21,7 @@ import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.context.annotation.Profile;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -31,6 +32,7 @@ import java.util.*;
 @Component
 @Slf4j
 @RequiredArgsConstructor
+@Profile("!test")
 public class InitData implements CommandLineRunner {
 
     private final CategoryRepository categoryRepository;
@@ -165,7 +167,7 @@ public class InitData implements CommandLineRunner {
         LocalDateTime now = LocalDateTime.now();
         List<RentalData> rentalDataList = List.of(
                 // 현재 대여 중인 도서들 (반납일 X)
-                new RentalData(0, 1, now.minusDays(5), null),
+                new RentalData(1, 1, now.minusDays(5), null),
                 new RentalData(1, 1, now.minusDays(3), null),
                 new RentalData(2, 1, now.minusDays(2), null),
                 new RentalData(3, 1, now.minusDays(1), null),
