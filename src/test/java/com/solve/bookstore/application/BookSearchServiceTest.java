@@ -165,7 +165,7 @@ class BookSearchServiceTest {
         // given
         String title = "프로그래밍";
         String author = "이자바";
-        when(bookRepository.findByTitleContainingAndAuthorContaining(title, author)).thenReturn(List.of(book2));
+        when(bookRepository.findByTitleContainingOrAuthorContaining(title, author)).thenReturn(List.of(book2));
 
         // when
         BookSearchResponse response = bookSearchService.findBooksByTitleAndAuthor(title, author);

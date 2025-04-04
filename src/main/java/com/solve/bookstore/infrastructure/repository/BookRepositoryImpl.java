@@ -90,8 +90,8 @@ public class BookRepositoryImpl implements BookRepository {
     }
     
     @Override
-    public List<Book> findByTitleContainingAndAuthorContaining(String title, String author) {
-        List<BookEntity> entities = bookJpaRepository.findByTitleContainingAndAuthorContaining(title, author);
+    public List<Book> findByTitleContainingOrAuthorContaining(String title, String author) {
+        List<BookEntity> entities = bookJpaRepository.findByTitleContainingOrAuthorContaining(title, author);
         return entities.stream()
                 .map(bookMapper::toDomain)
                 .toList();

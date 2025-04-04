@@ -41,6 +41,19 @@ public class BookSearchController {
         return ResponseEntity.ok(bookSearchService.findBooksByAuthor(searchTerm));
     }
 
+    @Operation(summary = "제목, 저자(지은이)로 도서 검색", description = "제목과 저자(지은이)로 도서를 검색합니다. 부분 일치 검색이 가능합니다.")
+    @GetMapping("/title-author")
+    public ResponseEntity<BookSearchResponse> findBooksByTitleAndAuthor(
+            @Parameter(description = "검색할 도서 제목", required = true, example = "단순하게")
+            @NotEmpty(message = "검색어를 입력해주세요.")
+            @RequestParam String title,
+            @Parameter(description = "검색할 저자(지은이)", required = true, example = "지승")
+            @NotEmpty(message = "검색어를 입력해주세요.")
+            @RequestParam String author
+    ) {
+        return ResponseEntity.ok(bookSearchService.findBooksByTitleAndAuthor(title, author));
+    }
+
     @Operation(summary = "카테고리로 도서 검색", description = "카테고리 ID로 해당 카테고리에 속한 도서들을 검색합니다.")
     @GetMapping("/category/{categoryId}")
     public ResponseEntity<BookSearchResponse> searchByCategory(

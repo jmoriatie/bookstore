@@ -30,7 +30,25 @@ spring:
       host: localhost
       timeout: 10000ms
       port: 6379
-
+      connect-timeout: 500
+      lettuce:
+        pool:
+          max-active: 8
+          max-idle: 8
+          min-idle: 0
+          max-wait: -1
+        shutdown-timeout: 100ms
+  cache:
+    type: redis
+    redis:
+      time-to-live: 600000  # 10분
+      cache-null-values: false
+    cache-names:
+      - sameIsbnBooks
+      - booksByCategory
+      - booksByTitle
+      - booksByAuthor
+      - booksByTitleAndAuthor
 logging:
   level:
-    org.springframework.security: INFO
+    org.springframework.security: DEBUG

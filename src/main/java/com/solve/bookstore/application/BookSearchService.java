@@ -38,7 +38,7 @@ public class BookSearchService {
     /**
      * 동일 ISBN 도서 찾기
      */
-    @Cacheable(value = "sameIsbnBooks", key = "#isbn")
+    @Cacheable(value = "sameIsbnBooks", key = "#isbn", unless = "#result == null || #result.books().isEmpty()")
     @Transactional(readOnly = true)
     public BookSearchResponse getSameIsbnBooks(String isbn) {
         if (isbn == null || isbn.trim().isEmpty())
@@ -54,7 +54,7 @@ public class BookSearchService {
     /**
      * 카테고리별 도서 검색
      */
-    @Cacheable(value = "booksByCategory", key = "#categoryId.toString()")
+    @Cacheable(value = "booksByCategory", key = "#categoryId.toString()", unless = "#result == null || #result.books().isEmpty()")
     @Transactional(readOnly = true)
     public BookSearchResponse findBooksByCategory(CategoryId categoryId) {
         if (categoryId == null)
@@ -77,7 +77,7 @@ public class BookSearchService {
     /**
      * 제목으로 도서 검색(부분 일치)
      */
-    @Cacheable(value = "booksByTitle", key = "#title")
+    @Cacheable(value = "booksByTitle", key = "#title", unless = "#result == null || #result.books().isEmpty()")
     @Transactional(readOnly = true)
     public BookSearchResponse findBooksByTitle(String title) {
         if (title == null || title.trim().isEmpty())
@@ -93,7 +93,7 @@ public class BookSearchService {
     /**
      * 지은이로 도서 검색(부분 일치)
      */
-    @Cacheable(value = "booksByAuthor", key = "#author")
+    @Cacheable(value = "booksByAuthor", key = "#author", unless = "#result == null || #result.books().isEmpty()")
     @Transactional(readOnly = true)
     public BookSearchResponse findBooksByAuthor(String author) {
         if (author == null || author.trim().isEmpty())
@@ -108,7 +108,7 @@ public class BookSearchService {
     /**
      * 제목과 지은이로 도서 검색(부분 일치)
      */
-    @Cacheable(value = "booksByTitleAndAuthor", key = "#title + ':' + #author")
+    @Cacheable(value = "booksByTitleAndAuthor", key = "#title + ':' + #author", unless = "#result == null || #result.books().isEmpty()")
     @Transactional(readOnly = true)
     public BookSearchResponse findBooksByTitleAndAuthor(String title, String author) {
         if ((title == null || title.trim().isEmpty()) && (author == null || author.trim().isEmpty()))
@@ -120,7 +120,7 @@ public class BookSearchService {
         if (author == null || author.trim().isEmpty())
             return findBooksByTitle(title);
 
-        List<Book> books = bookRepository.findByTitleContainingAndAuthorContaining(title, author);
+        List<Book> books = bookRepository.findByTitleContainingOrAuthorContaining(title, author);
         List<BookSearchResponse.BookInfo> bookInfos = extractBookInfos(books);
 
         return BookSearchResponse.from(bookInfos, bookInfos.size());
@@ -138,13 +138,13 @@ public class BookSearchService {
     @Transactional(readOnly = true)
     public void clearBookCaches(Book book) {
         log.info("도서 관련 캐시 삭제: {}", book.getId());
-        
+
         Set<CategoryId> categoryIds = bookCategoryRepository.findCategoryIdByBookIdIn(book.getId());
         for (CategoryId categoryId : categoryIds) {
             clearCategoryCache(categoryId);
         }
     }
-    
+
     /**
      * 특정 카테고리 캐시 삭제
      */
@@ -152,7 +152,7 @@ public class BookSearchService {
     public void clearCategoryCache(CategoryId categoryId) {
         log.info("카테고리 캐시 삭제: {}", categoryId);
     }
-    
+
     /**
      * 모든 도서 검색 관련 캐시 삭제
      */
@@ -172,13 +172,13 @@ public class BookSearchService {
     }
 
     private Set<BookId> getBookIdsFromBooks(List<Book> books) {
-        if(books == null || books.isEmpty())
+        if (books == null || books.isEmpty())
             return Collections.emptySet();
         return books.stream().map(Book::getId).collect(Collectors.toSet());
     }
 
     private List<BookWithCategories> extractBookWithCategories(List<Book> books, Map<BookId, Set<Category>> categorysByBookIdsMap) {
-        if(books == null || books.isEmpty())
+        if (books == null || books.isEmpty())
             return Collections.emptyList();
         return books.stream()
                 .map(b -> new BookWithCategories(b, categorysByBookIdsMap.get(b.getId())))
@@ -186,7 +186,7 @@ public class BookSearchService {
     }
 
     private List<BookSearchResponse.BookInfo> getBookInfos(List<BookWithCategories> bookWithCategories) {
-        if(bookWithCategories == null || bookWithCategories.isEmpty())
+        if (bookWithCategories == null || bookWithCategories.isEmpty())
             return Collections.emptyList();
         return bookWithCategories.stream()
                 .map(BookSearchResponse.BookInfo::from)

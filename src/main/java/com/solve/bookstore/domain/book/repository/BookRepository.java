@@ -19,6 +19,6 @@ public interface BookRepository {
 
     List<Book> findByTitleContaining(String title);
     List<Book> findByAuthorContaining(String author);
-    List<Book> findByTitleContainingAndAuthorContaining(String title, String author);
+    List<Book> findByTitleContainingOrAuthorContaining(String title, String author);
     List<Book> findByStatus(BookStatus status);
 }
