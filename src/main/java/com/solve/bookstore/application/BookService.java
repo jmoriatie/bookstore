@@ -1,6 +1,7 @@
 package com.solve.bookstore.application;
 
 import com.solve.bookstore.application.dto.*;
+import com.solve.bookstore.domain.book.event.UpdatedBookEvent;
 import com.solve.bookstore.domain.book.model.Book;
 import com.solve.bookstore.domain.book.model.BookId;
 import com.solve.bookstore.domain.book.model.BookStatus;
@@ -11,6 +12,7 @@ import com.solve.bookstore.domain.bookcategory.repository.BookCategoryRepository
 import com.solve.bookstore.domain.category.model.CategoryId;
 import com.solve.bookstore.domain.category.repository.CategoryRepository;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,17 +23,18 @@ import java.util.stream.Collectors;
 @Service
 @Slf4j
 public class BookService {
+
+    private final ApplicationEventPublisher publisher;
+
     private final BookRepository bookRepository;
     private final CategoryRepository categoryRepository;
     private final BookCategoryRepository bookCategoryRepository;
 
-    private final BookSearchService bookSearchService;
-
-    public BookService(BookRepository bookRepository, CategoryRepository categoryRepository, BookCategoryRepository bookCategoryRepository, BookSearchService bookSearchService) {
+    public BookService(ApplicationEventPublisher publisher, BookRepository bookRepository, CategoryRepository categoryRepository, BookCategoryRepository bookCategoryRepository) {
+        this.publisher = publisher;
         this.bookRepository = bookRepository;
         this.categoryRepository = categoryRepository;
         this.bookCategoryRepository = bookCategoryRepository;
-        this.bookSearchService = bookSearchService;
     }
 
     /**
@@ -62,8 +65,8 @@ public class BookService {
         validateCategory(categoryIds);
 
         Book savedBook = bookRepository.save(saveBook);
-
         saveBookCategories(savedBook.getId(), categoryIds); // BookCategory 연관관계 저장
+
         return BookCreatedResponse.from(savedBook.getId().toString(), savedBook.getStatus().name(), message);
     }
 
@@ -77,6 +80,8 @@ public class BookService {
             return new CategoryChangedResponse(Collections.emptySet(), Collections.emptySet(), "변경할 카테고리가 비어있습니다.");
 
         Book book = getBook(bookId);
+
+        // 동일 종류(동일 isbn) 가진 도서 카테고리들도 업데이트
         Set<BookId> sameIsbnBookIds  = bookRepository.findByIsbn(book.getIsbn()).stream()
                 .map(Book::getId)
                 .collect(Collectors.toSet());
@@ -86,6 +91,9 @@ public class BookService {
 
         bookCategoryRepository.deleteByBookIdIn(sameIsbnBookIds); // 연관관계 삭제
         saveBookCategoriesForAllBook(sameIsbnBookIds, newCategoryIds);
+
+        UpdatedBookEvent updatedBookEvent = new UpdatedBookEvent(sameIsbnBookIds); // 캐시 초기화 이벤트
+        publisher.publishEvent(updatedBookEvent);
 
         return new CategoryChangedResponse(
                 sameIsbnBookIds.stream().map(BookId::toString).collect(Collectors.toSet()),
@@ -104,6 +112,9 @@ public class BookService {
 
         updateBookStatus(request.bookStatus(), book);
         Book savedBook =  bookRepository.save(book);
+
+        UpdatedBookEvent updatedBookEvent = new UpdatedBookEvent(Set.of(savedBook.getId())); // 캐시 초기화 이벤트
+        publisher.publishEvent(updatedBookEvent);
 
         return BookStatusChangeResponse.success(savedBook.getId().toString(), savedBook.getStatus().name());
     }
