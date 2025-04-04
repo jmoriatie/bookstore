@@ -101,7 +101,7 @@ class BookSearchServiceCachingTest {
     void findBooksByCategoryWithCaching() {
         // given
         when(categoryRepository.existsById(categoryId)).thenReturn(true);
-        when(bookCategoryRepository.findByCategoryId(categoryId)).thenReturn(List.of(bookCategory1, bookCategory2));
+        when(bookCategoryRepository.findBookIdByCategoryIdIn(categoryId)).thenReturn(Set.of(book1.getId(), book2.getId()));
         when(bookRepository.findByIds(any())).thenReturn(List.of(book1, book2));
 
         // when
@@ -117,7 +117,8 @@ class BookSearchServiceCachingTest {
         
         // existsById, findByCategoryId, findByIds는 각각 한 번씩만 호출되어야 함
         verify(categoryRepository, times(1)).existsById(categoryId);
-        verify(bookCategoryRepository, times(1)).findByCategoryId(categoryId);
+        verify(bookCategoryRepository, times(1)).findBookIdByCategoryIdIn(categoryId);
+        verify(bookCategoryRepository, times(1)).findCategorysByBookIds(Set.of(book1.getId(), book2.getId()));
         verify(bookRepository, times(1)).findByIds(any());
     }
     
@@ -129,10 +130,10 @@ class BookSearchServiceCachingTest {
 
         // when
         // 첫 번째 호출 - 실제 DB 호출 / 캐싱
-        BookSearchResponse response1 = bookSearchService.getSameIsbnBooks(book1);
+        BookSearchResponse response1 = bookSearchService.getSameIsbnBooks(book1.getIsbn().toString());
 
         // 두 번째 호출 - 캐시 호출
-        BookSearchResponse response2 = bookSearchService.getSameIsbnBooks(book1);
+        BookSearchResponse response2 = bookSearchService.getSameIsbnBooks(book1.getIsbn().toString());
 
         // then
         assertThat(response1.books()).hasSize(2);

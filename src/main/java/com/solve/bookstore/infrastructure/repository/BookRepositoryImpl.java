@@ -40,7 +40,14 @@ public class BookRepositoryImpl implements BookRepository {
     @Override
     public List<Book> findByIsbn(Isbn isbn) {
         List<BookEntity> entities = bookJpaRepository.findByIsbn(isbn.toString());
-        entities.forEach(b -> log.debug("### found book with ISBN id={} isbn={}", b.getId(), b.getIsbn()));
+        return entities.stream()
+                .map(bookMapper::toDomain)
+                .toList();
+    }
+
+    @Override
+    public List<Book> findByIsbnAndStatus(Isbn isbn, BookStatus status) {
+        List<BookEntity> entities = bookJpaRepository.findByIsbnAndStatus(isbn.toString(), status.name());
         return entities.stream()
                 .map(bookMapper::toDomain)
                 .toList();

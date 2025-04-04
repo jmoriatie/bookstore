@@ -85,10 +85,8 @@ public class BookService {
             return new CategoryChangedResponse(Collections.emptySet(), Collections.emptySet(), "변경할 카테고리가 비어있습니다.");
 
         Book book = getBook(bookId);
-        BookSearchResponse response = bookSearchService.getSameIsbnBooks(book.getIsbn().toString());
-        Set<BookId> sameIsbnBookIds = response.books().stream()
-                .map(BookSearchResponse.BookInfo::bookId)
-                .map(BookId::new)
+        Set<BookId> sameIsbnBookIds  = bookRepository.findByIsbn(book.getIsbn()).stream()
+                .map(Book::getId)
                 .collect(Collectors.toSet());
 
         Set<CategoryId> newCategoryIds = getCategoryIds(request);

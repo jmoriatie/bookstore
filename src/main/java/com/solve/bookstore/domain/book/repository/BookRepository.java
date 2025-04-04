@@ -14,6 +14,7 @@ public interface BookRepository {
     Book findById(BookId id);
     List<Book> findByIds(Set<BookId> bookIds);
     List<Book> findByIsbn(Isbn isbn);
+    List<Book> findByIsbnAndStatus(Isbn isbn, BookStatus status);
     void deleteAll();
 
     List<Book> findByTitleContaining(String title);

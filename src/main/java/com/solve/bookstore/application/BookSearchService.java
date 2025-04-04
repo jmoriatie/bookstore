@@ -3,9 +3,11 @@ package com.solve.bookstore.application;
 import com.solve.bookstore.application.dto.BookSearchResponse;
 import com.solve.bookstore.domain.book.model.Book;
 import com.solve.bookstore.domain.book.model.BookId;
+import com.solve.bookstore.domain.book.model.Isbn;
 import com.solve.bookstore.domain.book.repository.BookRepository;
-import com.solve.bookstore.domain.bookcategory.model.BookCategory;
+import com.solve.bookstore.domain.bookcategory.model.BookWithCategories;
 import com.solve.bookstore.domain.bookcategory.repository.BookCategoryRepository;
+import com.solve.bookstore.domain.category.model.Category;
 import com.solve.bookstore.domain.category.model.CategoryId;
 import com.solve.bookstore.domain.category.repository.CategoryRepository;
 import lombok.extern.slf4j.Slf4j;
@@ -15,9 +17,7 @@ import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -40,11 +40,18 @@ public class BookSearchService {
     /**
      * 동일 ISBN 도서 찾기
      */
-    @Cacheable(value = "sameIsbnBooks", key = "#book.isbn.toString()")
+    @Cacheable(value = "sameIsbnBooks", key = "#isbn")
     @Transactional(readOnly = true)
-    public BookSearchResponse getSameIsbnBooks(Book book) {
-        return BookSearchResponse.from(bookRepository.findByIsbn(book.getIsbn()));
+    public BookSearchResponse getSameIsbnBooks(String isbn) {
+        if (isbn == null || isbn.trim().isEmpty())
+            throw new IllegalArgumentException("검색할 ISBN은 필수입니다.");
+        List<Book> books = bookRepository.findByIsbn(new Isbn(isbn));
+
+        List<BookSearchResponse.BookInfo> bookInfos = extractBookInfos(books);
+
+        return BookSearchResponse.from(bookInfos, bookInfos.size());
     }
+
 
     /**
      * 카테고리별 도서 검색
@@ -57,19 +64,16 @@ public class BookSearchService {
 
         if (isNotExistCategory(categoryId)) {
             log.warn("존재하지 않는 카테고리 ID: {}", categoryId);
-            return BookSearchResponse.from(Collections.emptyList()); // 정상흐름
+            return BookSearchResponse.from(Collections.emptyList(), 0); // 정상흐름 처리
         }
-        
-        List<BookCategory> bookCategories = bookCategoryRepository.findByCategoryId(categoryId);
-        if (bookCategories.isEmpty()) {
-            return BookSearchResponse.from(Collections.emptyList());
-        }
-        
-        Set<BookId> bookIds = bookCategories.stream()
-                .map(BookCategory::getBookId)
-                .collect(Collectors.toSet());
-        
-        return BookSearchResponse.from(bookRepository.findByIds(bookIds));
+
+        Set<BookId> bookIds = bookCategoryRepository.findBookIdByCategoryIdIn(categoryId);
+        if (bookIds.isEmpty())
+            return BookSearchResponse.from(Collections.emptyList(), 0);
+
+        List<BookSearchResponse.BookInfo> bookInfos = extractBookInfos(bookIds);
+
+        return BookSearchResponse.from(bookInfos, bookInfos.size());
     }
 
     /**
@@ -80,7 +84,12 @@ public class BookSearchService {
     public BookSearchResponse findBooksByTitle(String title) {
         if (title == null || title.trim().isEmpty())
             throw new IllegalArgumentException("검색할 제목은 필수입니다.");
-        return BookSearchResponse.from(bookRepository.findByTitleContaining(title));
+
+        List<Book> books = bookRepository.findByTitleContaining(title);
+
+        List<BookSearchResponse.BookInfo> bookInfos = extractBookInfos(books);
+
+        return BookSearchResponse.from(bookInfos, bookInfos.size());
     }
 
     /**
@@ -91,7 +100,11 @@ public class BookSearchService {
     public BookSearchResponse findBooksByAuthor(String author) {
         if (author == null || author.trim().isEmpty())
             throw new IllegalArgumentException("검색할 지은이는 필수입니다.");
-        return BookSearchResponse.from(bookRepository.findByAuthorContaining(author));
+
+        List<Book> books = bookRepository.findByAuthorContaining(author);
+        List<BookSearchResponse.BookInfo> bookInfos = extractBookInfos(books);
+
+        return BookSearchResponse.from(bookInfos, bookInfos.size());
     }
 
     /**
@@ -100,19 +113,19 @@ public class BookSearchService {
     @Cacheable(value = "booksByTitleAndAuthor", key = "#title + ':' + #author")
     @Transactional(readOnly = true)
     public BookSearchResponse findBooksByTitleAndAuthor(String title, String author) {
-        if ((title == null || title.trim().isEmpty()) && (author == null || author.trim().isEmpty())) {
+        if ((title == null || title.trim().isEmpty()) && (author == null || author.trim().isEmpty()))
             throw new IllegalArgumentException("검색할 제목 또는 지은이 중 하나는 필수입니다.");
-        }
-        
-        if (title == null || title.trim().isEmpty()) {
-            return findBooksByAuthor(author);
-        }
-        
-        if (author == null || author.trim().isEmpty()) {
-            return findBooksByTitle(title);
-        }
 
-        return BookSearchResponse.from(bookRepository.findByTitleContainingAndAuthorContaining(title, author));
+        if (title == null || title.trim().isEmpty())
+            return findBooksByAuthor(author);
+
+        if (author == null || author.trim().isEmpty())
+            return findBooksByTitle(title);
+
+        List<Book> books = bookRepository.findByTitleContainingAndAuthorContaining(title, author);
+        List<BookSearchResponse.BookInfo> bookInfos = extractBookInfos(books);
+
+        return BookSearchResponse.from(bookInfos, bookInfos.size());
     }
 
     /**
@@ -158,5 +171,40 @@ public class BookSearchService {
 
     private boolean isNotExistCategory(CategoryId categoryId) {
         return !categoryRepository.existsById(categoryId);
+    }
+
+    private Set<BookId> getBookIdsFromBooks(List<Book> books) {
+        if(books == null || books.isEmpty())
+            return Collections.emptySet();
+        return books.stream().map(Book::getId).collect(Collectors.toSet());
+    }
+
+    private List<BookWithCategories> extractBookWithCategories(List<Book> books, Map<BookId, Set<Category>> categorysByBookIdsMap) {
+        if(books == null || books.isEmpty())
+            return Collections.emptyList();
+        return books.stream()
+                .map(b -> new BookWithCategories(b, categorysByBookIdsMap.get(b.getId())))
+                .toList();
+    }
+
+    private List<BookSearchResponse.BookInfo> getBookInfos(List<BookWithCategories> bookWithCategories) {
+        if(bookWithCategories == null || bookWithCategories.isEmpty())
+            return Collections.emptyList();
+        return bookWithCategories.stream()
+                .map(BookSearchResponse.BookInfo::from)
+                .toList();
+    }
+
+    private List<BookSearchResponse.BookInfo> extractBookInfos(List<Book> books) {
+        Map<BookId, Set<Category>> categorysByBookIdsMap
+                = bookCategoryRepository.findCategorysByBookIds(getBookIdsFromBooks(books));
+        return getBookInfos(extractBookWithCategories(books, categorysByBookIdsMap));
+    }
+
+    private List<BookSearchResponse.BookInfo> extractBookInfos(Set<BookId> bookIds) {
+        Map<BookId, Set<Category>> categorysByBookIdsMap
+                = bookCategoryRepository.findCategorysByBookIds(bookIds);
+        List<Book> books = bookRepository.findByIds(bookIds);
+        return getBookInfos(extractBookWithCategories(books, categorysByBookIdsMap));
     }
 }

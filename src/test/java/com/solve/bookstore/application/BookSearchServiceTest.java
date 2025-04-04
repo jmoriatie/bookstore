@@ -6,6 +6,7 @@ import com.solve.bookstore.domain.book.model.BookId;
 import com.solve.bookstore.domain.book.model.Isbn;
 import com.solve.bookstore.domain.book.repository.BookRepository;
 import com.solve.bookstore.domain.bookcategory.model.BookCategory;
+import com.solve.bookstore.domain.bookcategory.model.BookWithCategories;
 import com.solve.bookstore.domain.bookcategory.repository.BookCategoryRepository;
 import com.solve.bookstore.domain.category.model.Category;
 import com.solve.bookstore.domain.category.model.CategoryId;
@@ -18,7 +19,9 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -71,7 +74,7 @@ class BookSearchServiceTest {
         when(bookRepository.findByIsbn(any(Isbn.class))).thenReturn(List.of(book1, book2));
 
         // when
-        BookSearchResponse response = bookSearchService.getSameIsbnBooks(book1);
+        BookSearchResponse response = bookSearchService.getSameIsbnBooks(book1.getIsbn().toString());
         Set<BookId> result = response.books().stream().
                 map(BookSearchResponse.BookInfo::bookId)
                 .map(BookId::new)
@@ -86,20 +89,28 @@ class BookSearchServiceTest {
     @DisplayName("카테고리별 도서 검색")
     void findBooksByCategoryTest() {
         // given
+        Map<BookId, Set<Category>> categorysByBookIdsMap = new HashMap<>();
+        categorysByBookIdsMap.put(book1.getId(), Set.of(category));
+        categorysByBookIdsMap.put(book2.getId(), Set.of(category));
         when(categoryRepository.existsById(categoryId)).thenReturn(true);
-        when(bookCategoryRepository.findByCategoryId(categoryId)).thenReturn(List.of(bookCategory1, bookCategory2));
+        when(bookCategoryRepository.findBookIdByCategoryIdIn(categoryId)).thenReturn(Set.of(book1.getId(), book2.getId()));
+        when(bookCategoryRepository.findCategorysByBookIds(Set.of(book1.getId(), book2.getId()))).thenReturn(categorysByBookIdsMap);
         when(bookRepository.findByIds(any())).thenReturn(List.of(book1, book2));
 
         // when
         BookSearchResponse response = bookSearchService.findBooksByCategory(categoryId);
 
-        BookSearchResponse.BookInfo resultBook1 = BookSearchResponse.BookInfo.from(book1);
-        BookSearchResponse.BookInfo resultBook2 = BookSearchResponse.BookInfo.from(book2);
+        BookWithCategories bookWithCategories1 = BookWithCategories.of(book1, Set.of(category));
+        BookWithCategories bookWithCategories2 = BookWithCategories.of(book2, Set.of(category));
+        BookSearchResponse.BookInfo bookInfo1 = BookSearchResponse.BookInfo.from(bookWithCategories1);
+        BookSearchResponse.BookInfo bookInfo2 = BookSearchResponse.BookInfo.from(bookWithCategories2);
+
         // then
         assertThat(response.books()).hasSize(2);
-        assertThat(response.books()).containsExactly(resultBook1, resultBook2);
+        assertThat(response.books()).containsExactly(bookInfo1, bookInfo2);
         verify(categoryRepository, times(1)).existsById(categoryId);
-        verify(bookCategoryRepository, times(1)).findByCategoryId(categoryId);
+        verify(bookCategoryRepository, times(1)).findBookIdByCategoryIdIn(categoryId);
+        verify(bookCategoryRepository, times(1)).findCategorysByBookIds(Set.of(book1.getId(), book2.getId()));
         verify(bookRepository, times(1)).findByIds(any());
     }
 

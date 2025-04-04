@@ -11,6 +11,8 @@ import com.solve.bookstore.domain.bookcategory.repository.BookCategoryRepository
 import com.solve.bookstore.domain.category.model.Category;
 import com.solve.bookstore.domain.category.model.CategoryId;
 import com.solve.bookstore.domain.category.repository.CategoryRepository;
+import com.solve.bookstore.domain.rental.repository.RentalRepository;
+import com.solve.bookstore.infrastructure.repository.RentalJpaRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,14 +41,18 @@ class BookServiceTest {
     @Autowired
     BookCategoryRepository bookCategoryRepository;
     @Autowired
+    RentalJpaRepository rentalJpaRepository;
+    @Autowired
     TransactionTemplate transactionTemplate;
 
     @BeforeEach
     void beforeEach() {
+        rentalJpaRepository.deleteAll();
         bookRepository.deleteAll();
         categoryRepository.deleteAll();
         bookCategoryRepository.deleteAll();
 
+        log.debug("### success rentalJpaRepository.deleteAll()");
         log.debug("### success bookRepository.deleteAll()");
         log.debug("### success categoryRepository.deleteAll()");
         log.debug("### success bookCategoryRepository.deleteAll()");

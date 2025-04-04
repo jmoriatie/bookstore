@@ -3,16 +3,20 @@ package com.solve.bookstore.infrastructure.repository;
 import com.solve.bookstore.domain.book.model.BookId;
 import com.solve.bookstore.domain.bookcategory.model.BookCategory;
 import com.solve.bookstore.domain.bookcategory.repository.BookCategoryRepository;
+import com.solve.bookstore.domain.category.model.Category;
 import com.solve.bookstore.domain.category.model.CategoryId;
 import com.solve.bookstore.infrastructure.entity.BookCategoryEntity;
 import com.solve.bookstore.infrastructure.entity.BookEntity;
 import com.solve.bookstore.infrastructure.entity.CategoryEntity;
+import com.solve.bookstore.infrastructure.repository.dto.BookCategoryQueryResult;
 import com.solve.bookstore.infrastructure.repository.mapper.BookCategoryMapper;
+import com.solve.bookstore.infrastructure.repository.mapper.CategoryMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -28,12 +32,21 @@ public class BookCategoryRepositoryImpl implements BookCategoryRepository {
     private final CategoryJpaRepository categoryJpaRepository;
     private final BookCategoryJpaRepository bookCategoryJpaRepository;
     private final BookCategoryMapper bookCategoryMapper;
+    private final CategoryMapper categoryMapper;
 
     @Override
     public Set<CategoryId> findCategoryIdByBookIdIn(BookId bookId) {
         Set<String> categoryIdsStr = bookCategoryJpaRepository.findCategory_IdByBook_IdIn(bookId.toString());
         return categoryIdsStr.stream()
                 .map(CategoryId::new)
+                .collect(Collectors.toSet());
+    }
+
+    @Override
+    public Set<BookId> findBookIdByCategoryIdIn(CategoryId categoryId) {
+        Set<String> bookIdsStr = bookCategoryJpaRepository.findBook_IdByCategory_IdIn(categoryId.toString());
+        return bookIdsStr.stream()
+                .map(BookId::new)
                 .collect(Collectors.toSet());
     }
 
@@ -64,10 +77,10 @@ public class BookCategoryRepositoryImpl implements BookCategoryRepository {
     }
 
     @Override
-    public int deleteByBookIdIn(Set<BookId> bookIds) {
+    public void deleteByBookIdIn(Set<BookId> bookIds) {
         Set<String> idsStr = bookIds.stream()
                 .map(BookId::toString).collect(Collectors.toSet());
-        return bookCategoryJpaRepository.deleteByBook_IdIn(idsStr);
+        bookCategoryJpaRepository.deleteByBook_IdIn(idsStr);
     }
 
     @Override
@@ -81,12 +94,27 @@ public class BookCategoryRepositoryImpl implements BookCategoryRepository {
     public void deleteAll() {
         bookCategoryJpaRepository.deleteAll();
     }
-    
+
     @Override
     public List<BookCategory> findByCategoryId(CategoryId categoryId) {
         List<BookCategoryEntity> entities = bookCategoryJpaRepository.findByCategory_Id(categoryId.toString());
         return entities.stream()
                 .map(bookCategoryMapper::toDomain)
                 .toList();
+    }
+
+    @Override
+    public Map<BookId, Set<Category>> findCategorysByBookIds(Set<BookId> bookIds) {
+        Set<String> booIdsStr = bookIds.stream().map(BookId::toString).collect(Collectors.toSet());
+        List<BookCategoryQueryResult> results = bookCategoryJpaRepository.findCategoryWithBookIds(booIdsStr);
+        return results.stream()
+                .collect(Collectors.groupingBy(
+                                result -> new BookId(result.bookId()),
+                                Collectors.mapping(
+                                        result -> categoryMapper.toDomain(result.category()),
+                                        Collectors.toSet()
+                                )
+                        )
+                );
     }
 }
