@@ -34,8 +34,6 @@ public class BookSearchService {
         this.bookCategoryRepository = bookCategoryRepository;
     }
 
-    // --- 필요 ---
-    // TODO Exception 커스텀
 
     /**
      * 동일 ISBN 도서 찾기

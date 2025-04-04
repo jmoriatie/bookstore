@@ -16,10 +16,10 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.util.List;
@@ -35,11 +35,11 @@ import static org.mockito.Mockito.*;
 @ActiveProfiles("test")
 class BookSearchServiceCachingTest {
 
-    @MockitoBean
+    @MockBean
     private BookRepository bookRepository;
-    @MockitoBean
+    @MockBean
     private CategoryRepository categoryRepository;
-    @MockitoBean
+    @MockBean
     private BookCategoryRepository bookCategoryRepository;
     @Autowired
     private CacheManager cacheManager;

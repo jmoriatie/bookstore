@@ -76,7 +76,6 @@ public class Rental {
         this.status = RentalStatus.RETURNED;
     }
 
-    // TODO 연체로 변경하는 스케쥴링 서비스 필요
     public void overdue(){
         if(LocalDateTime.now().isAfter(this.expectedReturnDate)){
             this.status = RentalStatus.OVERDUE;

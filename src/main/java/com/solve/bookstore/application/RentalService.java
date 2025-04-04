@@ -33,14 +33,6 @@ public class RentalService {
         this.bookService = bookService;
     }
 
-    // TODO 구현 -> 메서드 분리 -> Class 분리 단계별 리팩토링 필요
-
-    // TODO 연체 관련 메서드?
-
-    // --- 필요 ---
-    // TODO Exception 커스텀
-    // NOTE 카운터에서 대여 관리자가 바코드를 찍고 입력하는 등의 시나리오
-
     /**
      * 도서 대여
      */

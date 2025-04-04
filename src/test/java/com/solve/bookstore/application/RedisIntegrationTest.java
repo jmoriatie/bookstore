@@ -13,10 +13,10 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.util.List;
@@ -33,11 +33,11 @@ class RedisIntegrationTest {
     private CacheManager cacheManager;
     @Autowired
     private BookSearchService bookSearchService;
-    @MockitoBean
+    @MockBean
     private BookRepository bookRepository;
-    @MockitoBean
+    @MockBean
     private CategoryRepository categoryRepository;
-    @MockitoBean
+    @MockBean
     private BookCategoryRepository bookCategoryRepository;
 
 

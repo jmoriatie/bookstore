@@ -34,14 +34,6 @@ public class BookService {
         this.bookSearchService = bookSearchService;
     }
 
-    // TODO 구현 -> 메서드 분리 -> Class 분리 단계별 리팩토링 필요
-    //  도메인서비스 -> categoryService : validation, id 확인 등 분리
-    //  도메인서비스 -> bookCategoryService? domain 분리?
-
-    // --- 필요 ---
-    // TODO CRUD 더?
-    // TODO Exception 커스텀
-
     /**
      * 도서 등록
      * 요구사항: 신규도서는 항상 카테고리가 필요하다

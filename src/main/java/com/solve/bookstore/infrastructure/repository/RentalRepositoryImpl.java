@@ -42,9 +42,6 @@ public class RentalRepositoryImpl implements RentalRepository {
         return rentalMapper.toDomain(entity);
     }
 
-    // TODO update???
-
-
     @Override
     public Rental findTopByBookId(BookId bookId) {
         RentalEntity entity = rentalJpaRepository.findTopByBook_IdIn(bookId.toString())
