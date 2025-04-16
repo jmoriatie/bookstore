@@ -1,11 +1,17 @@
-도서 등록 및 관리 백엔드 API 시스템
----
-- 학습한 DDD Layered architecture 를 최대한 적용해보며 레이어를 분할하고, 도메인 레이어는 POJO로 유지하는 방향으로 진행했습니다.
+# 도서 등록 및 관리 백엔드 API 시스템
+
+## 개요
+- 학습한 DDD Layered architecture 를 최대한 적용해보며 레이어를 분할했습니다.
+- 도메인 레이어는 POJO로 유지하는 방향으로 진행했습니다.
 - JUnit을 활용해 classic, mockito 테스트 방식을 직접 작성해보며 테스트 방법에 대해 고민했습니다.
-- 기타로 검색에 Spring-Redis 캐싱, 캐시 삭제시 Publisher 적용한 비동기 이벤트를 적용해봤습니다. 
+- 검색에 Spring-Redis 캐싱을 적용해보았습니다.
+- 캐시 삭제시 Publisher 적용한 비동기 이벤트를 적용해 보았습니다. 
 
+## **공수 및 개발내용**
+- 총 개발기간 7일
+- 백엔드 API 전체 개발
+  
 ## **환경**
-
 - Spring Boot 3.3.4
 - Spring Security: Role 적용
 - java 17
